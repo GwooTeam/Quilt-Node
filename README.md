@@ -9,12 +9,13 @@
 * 작업 완료된 이슈는 작업 완료(머지) 후 닫는다.
 
 ### Branch
-* `main`, `Develop`, `Hotfix`, `Feature` 브랜치를 사용한다
-* `main`은 배포를 위한 브랜치이다. main에서는 배포 버전만을 다룬다. `main`에는 `Develop`, `Hotfix`만 머지할 수 있다.
-* `Develop`은 다음 출시 버전을 개발하는 브랜치이다. 일반적인 작업은 `Develop`에서 `Feature`브랜치를 만들어 개발한다.
-* `Hotfix`는 `main`의 배포 버전에 문제가 있을 경우 급한 수정을 위해 사용한다.
-* `Feature`는 새로운 기능 개발 및 버그 수정이 필요할 때마다 `Develop` 브랜치로부터 분기한다. 브랜치명은 `{작업영역}/{기능}` 규칙을 따른다.
-* 사용한 `Feature`브랜치는 머지 후 리모트에서 삭제한다.
+* `main`, `develop`, `hotfix`, `feature` 브랜치를 사용한다
+* `main`은 배포를 위한 브랜치이다. main에서는 배포 버전만을 다룬다. `main`에는 `develop`, `Hotfix`만 머지할 수 있다.
+* `develop`은 다음 출시 버전을 개발하는 브랜치이다. 일반적인 작업은 `develop`에서 `feature`브랜치를 만들어 개발한다.
+* `hotfix`는 `main`의 배포 버전에 문제가 있을 경우 급한 수정을 위해 사용한다.
+* `feature`는 새로운 기능 개발 및 버그 수정이 필요할 때마다 `develop` 브랜치로부터 분기한다. 브랜치명은 `feat/{기능요약}` 규칙을 따른다.
+  * 예시: feat/dockerfileSpring, bug/pysparkImage
+  * 사용한 `feature`브랜치는 머지 후 리모트에서 삭제한다.
 
 ### Commit
 * `작업태그` `[#이슈번호]` `Commit 내용`
