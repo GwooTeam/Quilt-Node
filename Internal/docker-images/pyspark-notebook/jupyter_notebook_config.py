@@ -11,4 +11,5 @@ def pre_save_hook(model, **kwargs):
     logger.info("Performing custom pre-save action for new notebook.")
 
 # Register the pre-save hook
-c.FileContentsManager.pre_save_hook = pre_save_hook
+# c.FileContentsManager.pre_save_hook = pre_save_hook
+# c.NotebookApp.startup_script = '/home/node/.ipython/profile_default/startup/00-startup_script.py'

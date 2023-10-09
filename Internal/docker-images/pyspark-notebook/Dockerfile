@@ -80,34 +80,31 @@ RUN mamba install --yes \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
-# 230927 added
-# add jupyter notebook config
-# USER root
-# RUN pip install nbextension \
-#     pip install jupyter_contrib_nbextensions \
-#     pip install --upgrade notebook==6.4.12 \
-#     jupyter contrib nbextension install --user
-
-# COPY jupyter_notebook_config.py ~/.jupyter/
 
 # USER ${NB_UID}
 
 # 230928 added, 231003 modify
 USER root
 
+# script for jupyter extension
 COPY nbext.sh /home/node/.jupyter/
-
 RUN chmod +x /home/node/.jupyter/nbext.sh
-# RUN chmod -R 777 /home/node/.local/
+
+# 231008 added
+RUN ipython profile create
+
+# 231007 added
+COPY startup_script.py /home/node/.ipython/profile_default/startup/00-startup.py
+RUN chmod +x /home/node/.ipython/profile_default/startup/00-startup.py
+
+# for jupyter extension
 RUN /home/node/.jupyter/nbext.sh
 
-# RUN pip install jupyter_contrib_nbextensions \
-#     pip install --upgrade notebook==6.4.12 \
-#     jupyter contrib nbextension install --user
-
+# for jupyter extension
 COPY jupyter_notebook_config.py /home/node/.jupyter/
 RUN chmod +x /home/node/.jupyter/jupyter_notebook_config.py
 
+# not secure option
 RUN chmod -R 777 /home/node/
 
 USER ${NB_UID}
