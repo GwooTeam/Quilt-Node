@@ -1,0 +1,50 @@
+name: Build Docker Image on Push
+
+on:
+  push:
+    branches:
+      - main # Adjust this to the branch you want to trigger on
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build foundation
+        run: docker build -t quiltbase/quilt-foundation:latest ./docker-stacks-foundation
+
+      - name: Push foundation
+        run: docker push quiltbase/quilt-foundation:latest
+
+      - name: Bulld base-notebook
+        run: docker build -t quiltbase/quilt-base-notebook:latest ./base-notebook
+
+      - name: Push base-notebook
+        run: docker push quiltbase/quilt-base-notebook:latest
+
+      - name: Build minimal-notebook
+        run: docker build -t quiltbase/quilt-minimal-notebook:latest ./minimal-notebook
+
+      - name: Push minimal-notebook
+        run: docker push quiltbase/quilt-minimal-notebook:latest
+
+      - name: Build scipy-notebook
+        run: docker build -t quiltbase/quilt-scipy-notebook:latest ./scipy-notebook
+
+      - name: Push scipy-notebook
+        run: docker push quiltbase/quilt-scipy-notebook:latest
+
+      - name: Build pyspark-notebook
+        run: docker build -t quiltbase/quilt-pyspark-notebook:latest ./pyspark-notebook
+
+      - name: Push pyspark-notebook
+        run: docker push quiltbase/quilt-pyspark-notebook:latest
