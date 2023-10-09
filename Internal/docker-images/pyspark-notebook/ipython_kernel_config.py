@@ -12,3 +12,6 @@
 #  Default: True
 # type:ignore
 c.IPKernelApp.capture_fd_output = False  # noqa: F821
+
+# 231007 added
+# c.InteractiveShellApp.exec_files = ['/home/node/.ipython/profile_default/startup/startup_script.py']
