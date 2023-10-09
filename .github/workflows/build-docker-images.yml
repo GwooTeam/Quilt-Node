@@ -3,7 +3,7 @@ name: Build Docker Image on Push
 on:
   push:
     branches:
-      - main # Adjust this to the branch you want to trigger on
+      - CICD # Adjust this to the branch you want to trigger on
 
 jobs:
   build:
