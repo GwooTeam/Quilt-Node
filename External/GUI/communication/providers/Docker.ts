@@ -6,6 +6,7 @@ import {CommandReply, IDocker} from "../controllers/IDocker";
 import {DefaultExecCreateOption, DefaultExecStartOption} from "../global/Dockerode-settings"
 import internal from "stream"
 import { PassThrough } from 'stream';
+import { Functional } from "tgrid/typings/Functional";
 const path = require("path");
 
 function getCurrentTime(): string {
@@ -26,6 +27,7 @@ function printStatus(mode:boolean):void{
 }
 
 export class DockerProvider implements IDocker{
+    [key: string]: any;
     private docker_:Dockerode;
     private container_?:Dockerode.Container | null;
     private containerOptions_?:Dockerode.ContainerCreateOptions;

@@ -7,6 +7,7 @@ export interface CommandReply{
 }
 
 export interface IDocker{
+    [key: string]: any;
     pullImage(image: string): void;
     createContainer(image: string, cmd?: string[]): void;
     startContainer(): void;
