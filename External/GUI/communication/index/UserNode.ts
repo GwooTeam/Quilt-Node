@@ -29,7 +29,7 @@ async function main(): Promise<void>
      * stop(false)하면 멈춘삥글 + 문장 이렇게 문장이 남아있다
      * 아래 코드는 성공하면 사라지고, 에러가 났을때에만 문장을 남겨서 어떤 명령에서 에러가 났는지 파악하도록 만들었다
      */
-
+    /*
     //pullImage()작동확인코드
     {
         let loading = new Spinner("이미지 다운 중");
@@ -68,7 +68,7 @@ async function main(): Promise<void>
         }
         loading.stop(true);
     }
-    /*
+
     //stopContainer()작동확인코드
     {
         let loading = new Spinner("컨테이너 중지 중");
@@ -81,7 +81,7 @@ async function main(): Promise<void>
         }
         loading.stop(true);
     }
-*/
+
     //sendCommandToContainer()작동확인코드
     for( let cmd of [["ls", `/path/to/nonexistent/directory`], [`echo`, `-e`, `Line 1\nLine 2\nLine 3`], [`bash`, `-c`, `'exit 7'`], [`sudo`, `cat`, `/etc/shadow`]])
     {
@@ -115,7 +115,21 @@ async function main(): Promise<void>
             console.error(err);
         }
     }
-
+    */
+    let cmds = ["ls -al", "docker run ubuntu"]
+    for(let cmd of cmds){
+        let commandReply:CommandReply;
+        let loading = new Spinner("SupplierNode에게 명령어 전달 중");
+        loading.start();
+        try{
+            commandReply = await dock.sendCommandToTerminal(cmd);
+            loading.stop(true);
+            console.log(commandReply);
+        }catch(reason:any){
+            loading.stop(false);
+            console.error(reason);
+        }
+    }
     //----
     // TERMINATE
     //----

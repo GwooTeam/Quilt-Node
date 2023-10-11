@@ -2,11 +2,12 @@
  * 이 파일은 Agent가 User에게 제공하는 Provider이다
  */
 import Dockerode from "dockerode";
-import {CommandReply, IDocker} from "../controllers/IDocker";
+import {CodeLanguage, CommandReply, IDocker} from "../controllers/IDocker";
 import {DefaultExecCreateOption, DefaultExecStartOption} from "../global/Dockerode-settings"
 import internal from "stream"
 import { PassThrough } from 'stream';
 const path = require("path");
+import {exec, spawn} from "child_process";
 
 function getCurrentTime(): string {
     const now = new Date();
@@ -25,6 +26,18 @@ function printStatus(mode:boolean):void{
     }
 }
 
+/**
+ * cmd가 docker로 시작하는 명령어인지 확인(for 이상한 명령실행 금지)
+ * @returns docker명령이라면 docker 이후 인자들을 띄어쓰기 기준으로 나눈 string[]
+ * 아니라면 null반환
+ */
+function isCmdDocker(cmd: string):null|string[]{
+    if(!cmd.startsWith("docker")){
+        return null;
+    }
+    return cmd.split(" ").splice(1); 
+}
+
 export class DockerProvider implements IDocker{
     private docker_:Dockerode;
     private container_?:Dockerode.Container | null;
@@ -33,6 +46,12 @@ export class DockerProvider implements IDocker{
     private bindedVolumePath = path.dirname(path.dirname(__filename))+`/bindedVolume`;
     public constructor(){
         this.docker_ = new Dockerode({host:"localhost", port:2375});
+    }
+    sendSourceCode(which_language: CodeLanguage): void {
+        throw new Error("Method not implemented.");
+    }
+    saveText(text: string): void {
+        throw new Error("Method not implemented.");
     }
     
     public async pullImage(image: string): Promise<void>{
@@ -248,10 +267,50 @@ export class DockerProvider implements IDocker{
             });
         });
     }
-    uploadAtBindedMount() {
+    public uploadAtBindedMount() {
         throw new Error("Method not implemented.");
     }
-    downloadAtBindedMount() {
+    public downloadAtBindedMount() {
         throw new Error("Method not implemented.");
+    }
+    public async sendCommandToTerminal(cmd: string): Promise<CommandReply> {
+        console.log(`[RFC][${getCurrentTime()}]터미널에게 커맨드 송신 명령`);
+
+        let commandReply: CommandReply={
+            ExitCode: undefined,
+            stdoutData: [],
+            stderrData: []
+        }
+
+        let arg = isCmdDocker(cmd);
+
+        let commandPromise = new Promise<CommandReply>((resolve, reject)=>{
+            //docker명령어가 아니라면 이상한 명령으로 취급
+
+            try{
+                if(arg === null){
+                    throw (new Error("recevied Suspicious Command from UserNode"));
+                }
+                const process_spawned = spawn("docker", arg!);
+
+                process_spawned.stdout.on("data", (chunk)=>{
+                    commandReply.stdoutData.push(chunk.toString());
+                });
+                process_spawned.stderr.on("data", (chunk)=>{
+                    commandReply.stderrData.push(chunk.toString());
+                });
+                
+                process_spawned.on('close', (code, signal)=>{
+                    commandReply.ExitCode = code;
+                    resolve(commandReply);
+                });
+                printStatus(true);
+            }catch(err){
+                reject(err);
+                printStatus(false);
+            }
+        })
+
+        return await commandPromise;
     }
 }
