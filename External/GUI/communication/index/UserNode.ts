@@ -115,6 +115,9 @@ async function main(): Promise<void>
                 continue;
             }
 
+            // 명령어를 received.txt 파일에 저장
+            fs.appendFileSync('received.txt', cmd.join(' ') + '\n');
+
             let commandReply: CommandReply;
             let loading = new Spinner("컨테이너에게 명령어 전달 중");
             loading.start();
