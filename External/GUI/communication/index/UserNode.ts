@@ -4,6 +4,11 @@ import { CommandReply, IDocker } from "../controllers/IDocker";
 import { DockerProvider } from "../providers/Docker";
 import {Spinner} from "cli-spinner";
 import { IMAGE_NAME, SERVER_IP, PORT_TGRID }from "../global/Dockerode-config"
+const fs = require('fs');
+
+
+
+
 async function main(): Promise<void>
 {
     //----
@@ -82,24 +87,50 @@ async function main(): Promise<void>
         loading.stop(true);
     }
 */
-    //sendCommandToContainer()작동확인코드
-    for( let cmd of [["ls", `/path/to/nonexistent/directory`], [`echo`, `-e`, `Line 1\nLine 2\nLine 3`], [`bash`, `-c`, `'exit 7'`], [`sudo`, `cat`, `/etc/shadow`]])
-    {
-        let commandReply: CommandReply;
-        let loading = new Spinner("컨테이너에게 명령어 전달 중");
-        loading.start();
-        try{
-            commandReply = await dock.sendCommandToContainer(cmd);
-            loading.stop(true);
-            console.log(commandReply);
-        }catch(err:any){
-            loading.stop(false);
+    // JSON 파일 읽기
+    fs.readFile('../listener/cmd.json', 'utf8', async function(err: Error, data: string) {
+        if (err) {
             console.error(err);
+            return;
         }
-    }
+
+        // JSON 문자열 파싱
+        let obj = JSON.parse(data);
+
+        // commands 키의 값 가져오기 
+        let commands = obj.commands;
+
+        if (!Array.isArray(commands)) {
+            console.error("Commands should be an array");
+            return;
+        }
+
+
+
+        //sendCommandToContainer()작동확인코드
+        for( let cmd of commands){
+
+            if (!Array.isArray(cmd)) {
+                console.error("Each command should be an array");
+                continue;
+            }
+
+            let commandReply: CommandReply;
+            let loading = new Spinner("컨테이너에게 명령어 전달 중");
+            loading.start();
+            try{
+                commandReply = await dock.sendCommandToContainer(cmd);
+                loading.stop(true);
+                console.log(commandReply);
+            }catch(err:any){
+                loading.stop(false);
+                console.error(err);
+            }
+        }
+    });
 
     //execToContainer()작동확인코드
-    for( let cmd of [["sudo", "mkdir", "testDir"], ["123123"]])
+    for( let cmd of [["whoami"], ["123123"]]) 
     {
         let commandReply: CommandReply;
         let loading = new Spinner("컨테이너에게 exec()하는 중");
