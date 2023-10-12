@@ -4,8 +4,61 @@ import { CommandReply, IDocker } from "../controllers/IDocker";
 import { DockerProvider } from "../providers/Docker";
 import {Spinner} from "cli-spinner";
 import { IMAGE_NAME, SERVER_IP, PORT_TGRID }from "../global/Dockerode-config"
+
+import readline from 'readline';
+
 const fs = require('fs');
 
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  function processUserInput(input: string): void {
+    // 사용자가 입력한 값 그대로 출력
+    console.log('You entered:', input);
+  }
+  
+  // 사용자 입력을 지속적으로 받는 무한 반복 루프
+  async function UserInput() {
+    rl.question('Enter command in JSON format: ', async (input) => {
+        // 사용자 입력값 그대로 출력
+        console.log(`You entered: ${input}`);
+
+        // "exit" 입력 시 무한루프 탈출
+        if (input.trim().toLowerCase() === 'exit') {
+            return rl.close();
+        }
+
+        let obj;
+        
+        // JSON 파싱 시도
+        try {
+            obj = JSON.parse(input);
+        } catch (err) {
+            console.error('Error parsing JSON:', err);
+            return UserInput();  // 오류가 발생하면 다시 입력받기
+        }
+
+         // cmd key 확인
+         if (obj.hasOwnProperty('cmd')) {
+            //  await sendCommandToTerminal(obj['cmd']);
+            console.log('sendCommandToTerminal function is executing...');
+             
+          // code key 확인   
+         } else if (obj.hasOwnProperty('code')) {
+            //  await sendSourceCode(obj['code']);
+            console.log('sendSourceCode function is executing...');
+             
+          // 그 외 경우   
+          } else {
+              console.error('Invalid command');
+          }
+          
+          return UserInput();  // 명령어를 처리한 후 다시 입력받기
+        
+    });
+}
 
 
 
@@ -154,7 +207,11 @@ async function main(): Promise<void>
             loading.stop(false);
             console.error(err);
         }
+       
     }
+
+   
+    UserInput();
 
     //----
     // TERMINATE
