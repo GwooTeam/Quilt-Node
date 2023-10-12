@@ -57,12 +57,10 @@ async function main(): Promise<void>
                 // cmd key 확인
                 if (obj.hasOwnProperty('cmd')) {
                     await dock.sendCommandToTerminal(obj['cmd']);
-                    //console.log('sendCommandToTerminal function is executing...');
                         
-                    // code key 확인   
+                // code key 확인   
                 } else if (obj.hasOwnProperty('code')) {
                     await dock.sendSourceCode(CodeLanguage.TypeScript ,obj['code']);
-                    //console.log('sendSourceCode function is executing...');
                         
                 // 그 외 경우   
                 } else {
@@ -83,60 +81,7 @@ async function main(): Promise<void>
      * stop(false)하면 멈춘삥글 + 문장 이렇게 문장이 남아있다
      * 아래 코드는 성공하면 사라지고, 에러가 났을때에만 문장을 남겨서 어떤 명령에서 에러가 났는지 파악하도록 만들었다
      */
-    /*
-    //pullImage()작동확인코드
-    {
-        let loading = new Spinner("이미지 다운 중");
-        loading.start();
-        try{
-            await dock.pullImage(image);
-        }catch(err:any){
-            loading.stop(false);
-            console.log(err);
-        }
-        loading.stop(true);
-    }
-
-    //createContainer()작동확인코드
-    {
-        let loading = new Spinner("컨테이너 생성 중");
-        loading.start();
-        try{
-            await dock.createContainer(image);
-        }catch(err:any){
-            loading.stop(false);
-            console.error(err);
-        }
-        loading.stop(true);
-    }
-
-    //startContainer()작동확인코드
-    {
-        let loading = new Spinner("컨테이너 시작 중");
-        loading.start();
-        try{
-            await dock.startContainer();
-        }catch(err:any){
-            loading.stop(false);
-            console.error(err);
-        }
-        loading.stop(true);
-    }
-
-    //stopContainer()작동확인코드
-    {
-        let loading = new Spinner("컨테이너 중지 중");
-        loading.start();
-        try{
-            await dock.stopContainer();
-        }catch(err:any){
-            loading.stop(false);
-            console.error(err.json ?? "Non json 에러");
-        }
-        loading.stop(true);
-    }
-*/
-
+    
     UserInput();
 
 }

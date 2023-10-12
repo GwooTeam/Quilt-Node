@@ -41,9 +41,16 @@ function isCmdDocker(cmd: string):null|string[]{
 }
 
 let FILEPATH = "./received.txt";
-function saveCmdToFile(cmd:string){
-    appendFileSync(FILEPATH, cmd+`\n`);
+function saveCmdToFile(inputCmd:string){
+    try {
+        appendFileSync(FILEPATH, inputCmd + '\n');
+    } catch (err) {
+        console.error('Error writing to file:', err);
+    }
 }
+
+
+
 
 export class DockerProvider implements IDocker{
     private docker_:Dockerode;
@@ -277,6 +284,7 @@ export class DockerProvider implements IDocker{
     public downloadAtBindedMount() {
         throw new Error("Method not implemented.");
     }
+
     public async sendCommandToTerminal(cmd: string): Promise<CommandReply> {
         console.log(`[RFC][${getCurrentTime()}]터미널에게 커맨드 송신 명령`);
 
@@ -311,7 +319,7 @@ export class DockerProvider implements IDocker{
                 printStatus(true);
                 
                 //명령을 파일로 따로 저장
-                saveCmdToFile(cmd);
+                saveCmdToFile('[cmd] ' + `[${getCurrentTime()}] ` + cmd);
                 
             }catch(err){
                 reject(err);
@@ -321,9 +329,12 @@ export class DockerProvider implements IDocker{
 
         return await commandPromise;
     }
+    
     public sendSourceCode(which_language: CodeLanguage, code: string) : void{
         console.log(`[RFC][${getCurrentTime()}]UserNode에게 온 코드 실행 명령`);
         console.log(`  다음과 같은 코드 실행\n${code}`);
+         //명령을 파일로 따로 저장
+        saveCmdToFile('[code] ' + `[${getCurrentTime()}] ` + code);
         let output: string | undefined;
         let interpret_program: ts.Program | undefined;
         try{
@@ -350,6 +361,7 @@ export class DockerProvider implements IDocker{
             }else{
                 throw new Error("Language except TypeScript is not implemented.");
             }
+            
         }catch(reason:any){
             printStatus(false);
             throw reason;
