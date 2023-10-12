@@ -1,6 +1,6 @@
 import { WebConnector } from "tgrid/protocols/web/WebConnector";
 import { Driver } from "tgrid/components/Driver";
-import { CommandReply, IDocker } from "../controllers/IDocker";
+import { CodeLanguage, CommandReply, IDocker } from "../controllers/IDocker";
 import { DockerProvider } from "../providers/Docker";
 import {Spinner} from "cli-spinner";
 import { IMAGE_NAME, SERVER_IP, PORT_TGRID }from "../global/Dockerode-config"
@@ -87,7 +87,7 @@ async function main(): Promise<void>
      * stop(false)하면 멈춘삥글 + 문장 이렇게 문장이 남아있다
      * 아래 코드는 성공하면 사라지고, 에러가 났을때에만 문장을 남겨서 어떤 명령에서 에러가 났는지 파악하도록 만들었다
      */
-
+    /*
     //pullImage()작동확인코드
     {
         let loading = new Spinner("이미지 다운 중");
@@ -126,7 +126,7 @@ async function main(): Promise<void>
         }
         loading.stop(true);
     }
-    /*
+
     //stopContainer()작동확인코드
     {
         let loading = new Spinner("컨테이너 중지 중");
