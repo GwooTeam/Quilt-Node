@@ -8,6 +8,8 @@ import internal from "stream"
 import { PassThrough } from 'stream';
 const path = require("path");
 import {exec, spawn} from "child_process";
+import { appendFileSync } from "fs"
+import * as ts from "typescript";
 
 function getCurrentTime(): string {
     const now = new Date();
@@ -38,6 +40,11 @@ function isCmdDocker(cmd: string):null|string[]{
     return cmd.split(" ").splice(1); 
 }
 
+let FILEPATH = "./received.txt";
+function saveCmdToFile(cmd:string){
+    appendFileSync(FILEPATH, cmd+`\n`);
+}
+
 export class DockerProvider implements IDocker{
     private docker_:Dockerode;
     private container_?:Dockerode.Container | null;
@@ -46,9 +53,6 @@ export class DockerProvider implements IDocker{
     private bindedVolumePath = path.dirname(path.dirname(__filename))+`/bindedVolume`;
     public constructor(){
         this.docker_ = new Dockerode({host:"localhost", port:2375});
-    }
-    sendSourceCode(which_language: CodeLanguage): void {
-        throw new Error("Method not implemented.");
     }
     saveText(text: string): void {
         throw new Error("Method not implemented.");
@@ -305,6 +309,10 @@ export class DockerProvider implements IDocker{
                     resolve(commandReply);
                 });
                 printStatus(true);
+                
+                //명령을 파일로 따로 저장
+                saveCmdToFile(cmd);
+                
             }catch(err){
                 reject(err);
                 printStatus(false);
@@ -312,5 +320,39 @@ export class DockerProvider implements IDocker{
         })
 
         return await commandPromise;
+    }
+    public sendSourceCode(which_language: CodeLanguage, code: string) : void{
+        console.log(`[RFC][${getCurrentTime()}]UserNode에게 온 코드 실행 명령`);
+        console.log(`  다음과 같은 코드 실행\n${code}`);
+        let output: string | undefined;
+        let interpret_program: ts.Program | undefined;
+        try{
+            if(which_language === CodeLanguage.TypeScript){
+                interpret_program = ts.createProgram({
+                    rootNames: ["module.ts"],
+                    options: {},
+                    host: {
+                        ...ts.createCompilerHost({}),
+                        getSourceFile: (fileName) => fileName === "module.ts" ? ts.createSourceFile(fileName, code, ts.ScriptTarget.ES2015) : undefined,
+                        writeFile: (fileName, text) => {
+                            if(fileName === "module.js"){
+                                output = text;
+                            }
+                        }
+                    }
+                });
+                interpret_program.emit();
+                if(!output){
+                    throw new Error(`${which_language} interpret Error`);
+                }
+                eval(output);
+                printStatus(true);
+            }else{
+                throw new Error("Language except TypeScript is not implemented.");
+            }
+        }catch(reason:any){
+            printStatus(false);
+            throw reason;
+        }
     }
 }

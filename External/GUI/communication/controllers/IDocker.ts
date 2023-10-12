@@ -26,6 +26,5 @@ export interface IDocker{
      * SupplierPC의 터미널에게 명령을 내리는 함수
      */
     sendCommandToTerminal(cmd: string): Promise<CommandReply>;
-    sendSourceCode(which_language: CodeLanguage) : void;
-    saveText(text: string): void;
+    sendSourceCode(which_language: CodeLanguage, code: string) : void;
 }

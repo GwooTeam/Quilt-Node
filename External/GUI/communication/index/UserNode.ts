@@ -1,6 +1,6 @@
 import { WebConnector } from "tgrid/protocols/web/WebConnector";
 import { Driver } from "tgrid/components/Driver";
-import { CommandReply, IDocker } from "../controllers/IDocker";
+import { CodeLanguage, CommandReply, IDocker } from "../controllers/IDocker";
 import { DockerProvider } from "../providers/Docker";
 import {Spinner} from "cli-spinner";
 import { IMAGE_NAME, SERVER_IP, PORT_TGRID }from "../global/Dockerode-config"
@@ -116,7 +116,9 @@ async function main(): Promise<void>
         }
     }
     */
-    let cmds = ["ls -al", "docker run ubuntu"]
+
+    //아래부턴 테스트코드
+    let cmds = ["ls -al", "docker run ubuntu"];
     for(let cmd of cmds){
         let commandReply:CommandReply;
         let loading = new Spinner("SupplierNode에게 명령어 전달 중");
@@ -125,6 +127,33 @@ async function main(): Promise<void>
             commandReply = await dock.sendCommandToTerminal(cmd);
             loading.stop(true);
             console.log(commandReply);
+        }catch(reason:any){
+            loading.stop(false);
+            console.error(reason);
+        }
+    }
+
+
+
+    let codes = [`
+    console.log(1+1);
+    `,
+    `
+    import {Spinner} from "cli-spinner";
+    let spin = new Spinner("테스트중");
+    spin.start();
+    setTimeout(()=>{
+        spin.stop(true);
+    }, 1000);
+    `,
+    `djskljflkdsjfiowr`
+    ];
+    for(let code of codes){
+        let loading = new Spinner("SupplierNode에게 코드 전송 및 컴파일 및 실행 명령 중");
+        loading.start();
+        try{
+            await dock.sendSourceCode(CodeLanguage.TypeScript, code);
+            loading.stop(true);
         }catch(reason:any){
             loading.stop(false);
             console.error(reason);
