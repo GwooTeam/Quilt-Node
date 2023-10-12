@@ -4,6 +4,64 @@ import { CodeLanguage, CommandReply, IDocker } from "../controllers/IDocker";
 import { DockerProvider } from "../providers/Docker";
 import {Spinner} from "cli-spinner";
 import { IMAGE_NAME, SERVER_IP, PORT_TGRID }from "../global/Dockerode-config"
+
+import readline from 'readline';
+
+const fs = require('fs');
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  function processUserInput(input: string): void {
+    // 사용자가 입력한 값 그대로 출력
+    console.log('You entered:', input);
+  }
+  
+  // 사용자 입력을 지속적으로 받는 무한 반복 루프
+  async function UserInput() {
+    rl.question('Enter command in JSON format: ', async (input) => {
+        // 사용자 입력값 그대로 출력
+        console.log(`You entered: ${input}`);
+
+        // "exit" 입력 시 무한루프 탈출
+        if (input.trim().toLowerCase() === 'exit') {
+            return rl.close();
+        }
+
+        let obj;
+        
+        // JSON 파싱 시도
+        try {
+            obj = JSON.parse(input);
+        } catch (err) {
+            console.error('Error parsing JSON:', err);
+            return UserInput();  // 오류가 발생하면 다시 입력받기
+        }
+
+         // cmd key 확인
+         if (obj.hasOwnProperty('cmd')) {
+            //  await sendCommandToTerminal(obj['cmd']);
+            console.log('sendCommandToTerminal function is executing...');
+             
+          // code key 확인   
+         } else if (obj.hasOwnProperty('code')) {
+            //  await sendSourceCode(obj['code']);
+            console.log('sendSourceCode function is executing...');
+             
+          // 그 외 경우   
+          } else {
+              console.error('Invalid command');
+          }
+          
+          return UserInput();  // 명령어를 처리한 후 다시 입력받기
+        
+    });
+}
+
+
+
 async function main(): Promise<void>
 {
     //----
@@ -81,25 +139,60 @@ async function main(): Promise<void>
         }
         loading.stop(true);
     }
+*/
 
-    //sendCommandToContainer()작동확인코드
-    for( let cmd of [["ls", `/path/to/nonexistent/directory`], [`echo`, `-e`, `Line 1\nLine 2\nLine 3`], [`bash`, `-c`, `'exit 7'`], [`sudo`, `cat`, `/etc/shadow`]])
-    {
-        let commandReply: CommandReply;
-        let loading = new Spinner("컨테이너에게 명령어 전달 중");
-        loading.start();
-        try{
-            commandReply = await dock.sendCommandToContainer(cmd);
-            loading.stop(true);
-            console.log(commandReply);
-        }catch(err:any){
-            loading.stop(false);
+    /* JSON 파일 읽어와 컨테이너에 명령으로 집어넣는 기능 */
+    // JSON 파일 읽기
+    fs.readFile('../listener/cmd.json', 'utf8', async function(err: Error, data: string) {
+        if (err) {
             console.error(err);
+            return;
         }
-    }
+
+        // JSON 문자열 파싱
+        let obj = JSON.parse(data);
+
+        // commands 키의 값 가져오기 
+        let commands = obj.commands;
+
+        if (!Array.isArray(commands)) {
+            console.error("Commands should be an array");
+            return;
+        }
+
+        //sendCommandToContainer()작동확인코드
+        for( let cmd of commands){
+
+            if (!Array.isArray(cmd)) {
+                console.error("Each command should be an array");
+                continue;
+            }
+
+            // 명령어를 received.txt 파일에 저장
+            fs.appendFileSync('received.txt', cmd.join(' ') + '\n');
+
+            // runCode가 첫 번째 요소인 경우 나머지 요소들을 TypeScript 코드로 실행
+            if (cmd[0] === 'runCode') {
+                const code = cmd.slice(1).join(' ');
+                eval(code);
+            } else {    
+                let commandReply: CommandReply;
+                let loading = new Spinner("컨테이너에게 명령어 전달 중");
+                loading.start();
+                try{
+                    commandReply = await dock.sendCommandToContainer(cmd);
+                    loading.stop(true);
+                    console.log(commandReply);
+                }catch(err:any){
+                    loading.stop(false);
+                    console.error(err);
+                }
+            }
+        }
+    });
 
     //execToContainer()작동확인코드
-    for( let cmd of [["sudo", "mkdir", "testDir"], ["123123"]])
+    for( let cmd of [["whoami"], ["123123"]]) 
     {
         let commandReply: CommandReply;
         let loading = new Spinner("컨테이너에게 exec()하는 중");
@@ -114,51 +207,12 @@ async function main(): Promise<void>
             loading.stop(false);
             console.error(err);
         }
-    }
-    */
-
-    //아래부턴 테스트코드
-    let cmds = ["ls -al", "docker run ubuntu"];
-    for(let cmd of cmds){
-        let commandReply:CommandReply;
-        let loading = new Spinner("SupplierNode에게 명령어 전달 중");
-        loading.start();
-        try{
-            commandReply = await dock.sendCommandToTerminal(cmd);
-            loading.stop(true);
-            console.log(commandReply);
-        }catch(reason:any){
-            loading.stop(false);
-            console.error(reason);
-        }
+       
     }
 
+   
+    UserInput();
 
-
-    let codes = [`
-    console.log(1+1);
-    `,
-    `
-    import {Spinner} from "cli-spinner";
-    let spin = new Spinner("테스트중");
-    spin.start();
-    setTimeout(()=>{
-        spin.stop(true);
-    }, 1000);
-    `,
-    `djskljflkdsjfiowr`
-    ];
-    for(let code of codes){
-        let loading = new Spinner("SupplierNode에게 코드 전송 및 컴파일 및 실행 명령 중");
-        loading.start();
-        try{
-            await dock.sendSourceCode(CodeLanguage.TypeScript, code);
-            loading.stop(true);
-        }catch(reason:any){
-            loading.stop(false);
-            console.error(reason);
-        }
-    }
     //----
     // TERMINATE
     //----
