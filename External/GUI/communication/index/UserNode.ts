@@ -14,6 +14,8 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
+let dock: Driver<IDocker>;
+
 async function main(): Promise<void>
 {
     //----
@@ -26,16 +28,20 @@ async function main(): Promise<void>
     // CALL REMOTE FUNCTIONS
     //----
     // GET DRIVER
-    let dock: Driver<IDocker> = connector.getDriver<IDocker>();
+    dock = connector.getDriver<IDocker>();
     let image:string = IMAGE_NAME;
     
-    async function UserInput(dock: Driver<IDocker>) {
+    async function UserInput() {
         rl.question('Enter command in JSON format: ', async (input) => {
                 // 사용자 입력값 그대로 출력
                 console.log(`You entered: ${input}`);
     
                 // "exit" 입력 시 무한루프 탈출
                 if (input.trim().toLowerCase() === 'exit') {
+                        //----
+                    // TERMINATE
+                    //----
+                    await connector.close();
                     return rl.close();
                 }
     
@@ -46,7 +52,7 @@ async function main(): Promise<void>
                     obj = JSON.parse(input);
                 } catch (err) {
                     console.error('Error parsing JSON:', err);
-                    return UserInput(dock);  // 오류가 발생하면 다시 입력받기
+                    return UserInput();  // 오류가 발생하면 다시 입력받기
                 }
                 // cmd key 확인
                 if (obj.hasOwnProperty('cmd')) {
@@ -62,7 +68,7 @@ async function main(): Promise<void>
                 } else {
                     console.error('Invalid command');
                 }
-                return UserInput(dock);  // 명령어를 처리한 후 다시 입력받기
+                return UserInput();  // 명령어를 처리한 후 다시 입력받기
             }
         );
     }
@@ -131,11 +137,7 @@ async function main(): Promise<void>
     }
 */
 
-    UserInput(dock);
+    UserInput();
 
-    //----
-    // TERMINATE
-    //----
-    await connector.close();
 }
 main();
