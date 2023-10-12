@@ -87,6 +87,8 @@ async function main(): Promise<void>
         loading.stop(true);
     }
 */
+
+    /* JSON 파일 읽어와 컨테이너에 명령으로 집어넣는 기능 */
     // JSON 파일 읽기
     fs.readFile('../listener/cmd.json', 'utf8', async function(err: Error, data: string) {
         if (err) {
@@ -105,8 +107,6 @@ async function main(): Promise<void>
             return;
         }
 
-
-
         //sendCommandToContainer()작동확인코드
         for( let cmd of commands){
 
@@ -118,16 +118,22 @@ async function main(): Promise<void>
             // 명령어를 received.txt 파일에 저장
             fs.appendFileSync('received.txt', cmd.join(' ') + '\n');
 
-            let commandReply: CommandReply;
-            let loading = new Spinner("컨테이너에게 명령어 전달 중");
-            loading.start();
-            try{
-                commandReply = await dock.sendCommandToContainer(cmd);
-                loading.stop(true);
-                console.log(commandReply);
-            }catch(err:any){
-                loading.stop(false);
-                console.error(err);
+            // runCode가 첫 번째 요소인 경우 나머지 요소들을 TypeScript 코드로 실행
+            if (cmd[0] === 'runCode') {
+                const code = cmd.slice(1).join(' ');
+                eval(code);
+            } else {    
+                let commandReply: CommandReply;
+                let loading = new Spinner("컨테이너에게 명령어 전달 중");
+                loading.start();
+                try{
+                    commandReply = await dock.sendCommandToContainer(cmd);
+                    loading.stop(true);
+                    console.log(commandReply);
+                }catch(err:any){
+                    loading.stop(false);
+                    console.error(err);
+                }
             }
         }
     });
