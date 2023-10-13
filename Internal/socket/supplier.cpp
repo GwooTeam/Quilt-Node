@@ -3,6 +3,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cstring>
+#include "protocol.h"
 
 #define PORT 9000
 
@@ -34,12 +35,34 @@ int main(int argc, char const *argv[]) {
     }
 
     // Send message to the user
-    send(sock, hello, strlen(hello), 0);
-    std::cout << "Hello message sent" << std::endl;
+    FileMessage fileMsg;
+    fileMsg.type = MessageType::FILE;
+
+    std::string filePath = "/Users/youngjunlee/BoB/gwooteam/socket/example.txt"; // Replace with the actual file path
+    FILE* file = fopen(filePath.c_str(), "rb");
+    if (file) {
+        fseek(file, 0, SEEK_END);
+        fileMsg.fileSize = ftell(file);
+        fseek(file, 0, SEEK_SET);
+
+        // 파일 내용을 읽어 FileMessage에 복사
+        fread(fileMsg.data, 1, fileMsg.fileSize, file);
+        fclose(file);
+
+        send(sock, &fileMsg, sizeof(fileMsg) + fileMsg.fileSize, 0);
+        std::cout << "Sent File Message to Server." << std::endl;
+    } else {
+        std::cerr << "Failed to open file for sending." << std::endl;
+    }
+
+    // send(sock, hello, strlen(hello), 0);
+    // std::cout << "Hello message sent" << std::endl;
 
     // Receive message from the user
     valread = read(sock, buffer, 1024);
     std::cout << buffer << std::endl;
+
+    close(sock);
 
     return 0;
 }
