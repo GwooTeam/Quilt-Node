@@ -75,11 +75,11 @@ async function main(){
     let dockerProvider = new DockerProvider();
     let connector: WebConnector<null, DockerProvider> = new WebConnector(null, dockerProvider);
     await connector.connect(`ws://${SERVER_IP}:${PORT_TGRID}`);
+    loading.stop(true);
 
     let dock: Driver<IDocker> = connector.getDriver<IDocker>();
     let image:string = IMAGE_NAME;
 
-    loading.stop(true);
     console.log("TGRID 설정 완료! 곧 GUI 창이 열립니다")
 
     assignEvents(dock);
