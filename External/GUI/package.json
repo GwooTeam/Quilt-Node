@@ -6,8 +6,9 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
+    "webpackbuild": "webpack",
     "lint": "eslint -c .eslintrc --ext .ts ./src",
-    "start": "npm run build && electron ./dist/backend/main.js"
+    "start": "npm run build && npm run webpackbuild && electron ./dist/backend/main.js"
   },
   "author": "LiiNi-coder",
   "license": "ISC",
@@ -16,8 +17,11 @@
     "@types/dockerode": "^3.3.19",
     "@types/node": "^20.8.3",
     "electron": "^26.3.0",
+    "ts-loader": "^9.5.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "cli-spinner": "^0.2.10",

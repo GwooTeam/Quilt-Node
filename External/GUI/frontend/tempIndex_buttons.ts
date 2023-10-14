@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron');
 window.onload = function(){
     //renderer가 함수이름을 요청함 : request-functions
     ipcRenderer.send("request-functions");
+    console.log("########전송완료");
 }
 
 //renderer에게 함수이름을 보냄 : reply-functions

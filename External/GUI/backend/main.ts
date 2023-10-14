@@ -10,7 +10,7 @@ import { IMAGE_NAME, SERVER_IP, PORT_TGRID }from "../communication/global/Docker
 const mainWindowOption:Electron.BrowserWindowConstructorOptions ={
     height : 600,
     webPreferences:{
-        preload: path.join(__dirname, "preload.js"),
+        //preload: path.join(__dirname, "preload.js"),
         nodeIntegration:true,
         contextIsolation:false,
     },
@@ -19,20 +19,23 @@ const mainWindowOption:Electron.BrowserWindowConstructorOptions ={
 
 function createWindow():BrowserWindow{
     const mainWindow = new BrowserWindow(mainWindowOption);
+
+    //#####
+    mainWindow.webContents.openDevTools();
+
     //load the index.html of the app
     mainWindow.loadFile(path.join(__dirname, "../../frontend/tempIndex.html"));
     return mainWindow;
 }
 
 function assignEvents(dock: Driver<IDocker>){
-    let name_functions:string[] = []
+    let name_functions:string[] = fetchProvidersFromDockerode();
     //renderer가 함수이름을 요청함 : request-functions
     ipcMain.on("request-functions", (event)=>{
-        name_functions = fetchProvidersFromDockerode();
         console.log("#############"+name_functions);
         //renderer에게 함수이름을 보냄 : reply-functions
         event.reply("reply-functions", name_functions);
-    })
+    });
 
     //특정버튼이 클릭돼 renderer가 함수 기능 실행을 요청함 : call-function
     ipcMain.on("call-function", async (event, name_caller_Button)=>{
@@ -79,8 +82,7 @@ async function main(){
 
     let dock: Driver<IDocker> = connector.getDriver<IDocker>();
     let image:string = IMAGE_NAME;
-
-    console.log("TGRID 설정 완료! 곧 GUI 창이 열립니다")
+    console.log("TGRID is opend. now creat new Window soon.")
 
     assignEvents(dock);
     await app.whenReady();
