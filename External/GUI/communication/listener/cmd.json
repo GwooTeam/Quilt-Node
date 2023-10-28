@@ -1,0 +1,8 @@
+{
+    "commands": [
+        ["ls", "/path/to/nonexistent/directory"],
+        ["echo", "-e", "Line 1\nLine 2\nLine 3"],
+        ["bash", "-c", "'exit 7'"],
+        ["whoami"]
+    ]
+}

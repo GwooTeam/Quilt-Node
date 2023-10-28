@@ -8,5 +8,5 @@ async function main():Promise<void>{
         let provider: DockerProvider = new DockerProvider();
         await acceptor.accept(provider); 
     });
-}
+}   
 main();
