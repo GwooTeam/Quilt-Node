@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
         printf("EOF\n");
     }
 
-    // "-s" 옵션에 대한 동작 : 소유한 private key로 서명
+    // "-s" 옵션에 대한 동작 : 소유한 private key로 암호화하여 서명
     else if (strcmp(argv[1], "-s") == 0) {
         printf("optiion -s is selected. start singing.\n");
         
@@ -31,9 +31,10 @@ int main(int argc, char *argv[]) {
      // "-v" 옵션에 대한 동작 : 소유한 public key로 서명 검증
     else if (strcmp(argv[1], "-v") == 0) {
         printf("optiion -v is selected. start verification.\n");
-        const char *signed_file_path = argv[2]; // 두 번째 인자를 signed_file_path 변수에 저장
-        const char *puk_path = argv[3]; // 세 번째 인자를 prk_path 변수에 저장
-        dilithium_verify(signed_file_path,puk_path);
+        const char *data_file_path =  argv[2]; 
+        const char *signed_file_path = argv[3]; // 두 번째 인자를 signed_file_path 변수에 저장
+        const char *puk_path = argv[4]; // 세 번째 인자를 prk_path 변수에 저장
+        dilithium_verify(data_file_path, signed_file_path, puk_path);
         printf("EOF\n");
     }
 
