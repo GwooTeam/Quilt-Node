@@ -9,7 +9,7 @@ __pycache__/
 *$py.class
 
 # C extensions
-*.so
+#*.so
 
 # Distribution / packaging
 .Python
@@ -169,3 +169,9 @@ node_modules/
 
 # cmd txt file
 received.txt
+
+# digital signature file
+*.prk
+*.puk
+*.bin
+dmodule
