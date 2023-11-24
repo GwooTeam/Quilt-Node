@@ -175,3 +175,5 @@ received.txt
 *.puk
 *.bin
 dmodule
+/External/Sandbox/Runner/quilt-sandbox-gateway
+/External/Sandbox/Runner/sandbox_gateway
