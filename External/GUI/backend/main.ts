@@ -72,19 +72,21 @@ function setSendingStdoutToHTML(mainWindow:BrowserWindow){
     };
 }
 
-async function main(){
+async function connectWebsocketOfTgrid(){
     let loading = new Spinner("TGRID 초기 설정 중");
     loading.start();
     let dockerProvider = new DockerProvider();
     let connector: WebConnector<null, DockerProvider> = new WebConnector(null, dockerProvider);
     await connector.connect(`ws://${SERVER_IP}:${PORT_TGRID}`);
     loading.stop(true);
-
-    let dock: Driver<IDocker> = connector.getDriver<IDocker>();
-    let image:string = IMAGE_NAME;
+    
     console.log("TGRID is opend. now creat new Window soon.")
+    return connector.getDriver<IDocker>();;
+}
 
-    assignEvents(dock);
+async function main(){
+    //let tgrid_driver_dock:Driver<IDocker> = await connectWebsocketOfTgrid();
+    //assignEvents(tgrid_driver_dock);
     await app.whenReady();
     let mainWindow = createWindow();
 
