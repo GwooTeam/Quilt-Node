@@ -12,7 +12,7 @@ PULL_MODE = False
 """
 
 #샌드박스 이미지 이름
-SANDBOX_IMAGE_NAME = "hello-world"
+SANDBOX_IMAGE_NAME = "ubuntu"
 #샌드박스 컨테이너상 이름
 SANDBOX_NAME = "sandbox"
 #샌드박스(도커 컨테이너) 실행 cmd
