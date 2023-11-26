@@ -6,6 +6,7 @@ import { Driver } from "tgrid/components/Driver";
 import { CommandReply, IDocker } from "../communication/controllers/IDocker";
 import {Spinner} from "cli-spinner";
 import { IMAGE_NAME, SERVER_IP, PORT_TGRID }from "../communication/global/Dockerode-config"
+import { assignEvents_sandboxRunner } from "./sandbox_runner_event";
 
 const mainWindowOption:Electron.BrowserWindowConstructorOptions ={
     height : 600,
@@ -17,14 +18,14 @@ const mainWindowOption:Electron.BrowserWindowConstructorOptions ={
     width: 800,
 };
 
-function createWindow():BrowserWindow{
+function createWindow(index_html_name:String):BrowserWindow{
     const mainWindow = new BrowserWindow(mainWindowOption);
 
     //#####
     mainWindow.webContents.openDevTools();
 
     //load the index.html of the app
-    mainWindow.loadFile(path.join(__dirname, "../../frontend/tempIndex.html"));
+    mainWindow.loadFile(path.join(__dirname, "..", "..", "frontend", `${index_html_name}.html`));
     return mainWindow;
 }
 
@@ -84,18 +85,18 @@ async function connectWebsocketOfTgrid(){
     return connector.getDriver<IDocker>();;
 }
 
+
 async function main(){
     //let tgrid_driver_dock:Driver<IDocker> = await connectWebsocketOfTgrid();
     //assignEvents(tgrid_driver_dock);
     await app.whenReady();
-    let mainWindow = createWindow();
-
-    //setSendingStdoutToHTML(mainWindow);
-
+    let mainWindow = createWindow("sandbox_runner_test");
     app.on("window-all-closed", () => {
         if(process.platform !== "darwin") {
             app.quit();
         }
     });
+
+    assignEvents_sandboxRunner();
 }
 main();
