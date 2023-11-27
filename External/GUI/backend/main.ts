@@ -6,7 +6,7 @@ import { Driver } from "tgrid/components/Driver";
 import { CommandReply, IDocker } from "../communication/controllers/IDocker";
 import {Spinner} from "cli-spinner";
 import { IMAGE_NAME, SERVER_IP, PORT_TGRID }from "../communication/global/Dockerode-config"
-import { assignEvents_sandboxRunner } from "./sandbox_runner_event";
+import { SandboxRunner } from "./sandbox_runner_event";
 
 const mainWindowOption:Electron.BrowserWindowConstructorOptions ={
     height : 600,
@@ -97,6 +97,6 @@ async function main(){
         }
     });
 
-    assignEvents_sandboxRunner();
+    const sandbox_runner = new SandboxRunner(true);
 }
 main();
