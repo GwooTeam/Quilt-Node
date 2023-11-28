@@ -1,4 +1,4 @@
-//udp client
+//tcp client
 const net = require('net');
 const readline = require('readline');
 
@@ -7,8 +7,11 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-const port = 1234;
-const host = 'localhost';
+
+const config = require('./config.json');
+
+const port = config.server_port;
+const host = config.server_ip;
 
 const client = new net.Socket();
 

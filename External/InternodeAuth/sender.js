@@ -1,8 +1,8 @@
-//udp server
+//tcp server
 const net = require('net');
 
 const clients = [];
-const port = 1234;
+const port = 31245;
 
 const broadcast = (message, sender) => {
   clients.forEach(client => {

@@ -175,3 +175,6 @@ received.txt
 *.puk
 *.bin
 dmodule
+
+# internode auth
+config.json
