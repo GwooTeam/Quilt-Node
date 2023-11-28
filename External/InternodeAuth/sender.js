@@ -1,19 +1,37 @@
 //udp server
-const dgram = require('dgram');
-const server = dgram.createSocket('udp4');
+const net = require('net');
 
-const PORT = ;
-const HOST = 'localhost'; // Use 0.0.0.0 if you want to accept messages from any IP
+const clients = [];
+const port = 1234;
 
-server.on('listening', () => {
-  const address = server.address();
-  console.log(`UDP Server listening on ${address.address}:${address.port}`);
+const broadcast = (message, sender) => {
+  clients.forEach(client => {
+    // Don't send the message back to the sender
+    if (client !== sender) {
+      client.write(message);
+    }
+  });
+  console.log(message.trim());
+};
+
+const server = net.createServer(socket => {
+  console.log('A new client has connected');
+  clients.push(socket);
+
+  socket.on('data', data => {
+    broadcast(`${socket.remoteAddress}:${socket.remotePort} - ${data}`, socket);
+  });
+
+  socket.on('end', () => {
+    clients.splice(clients.indexOf(socket), 1);
+    console.log('A client has disconnected');
+  });
+
+  socket.on('error', error => {
+    console.error(`Error: ${error.message}`);
+  });
 });
 
-server.on('message', (message, remote) => {
-  console.log(`${remote.address}:${remote.port} - ${message}`);
-  // Echo the message back to the client
-  server.send(message, remote.port, remote.address);
+server.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
 });
-
-server.bind(PORT, HOST);

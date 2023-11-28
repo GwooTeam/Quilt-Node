@@ -1,28 +1,38 @@
 //udp client
-const dgram = require('dgram');
+const net = require('net');
 const readline = require('readline');
+
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
 
-const client = dgram.createSocket('udp4');
-const PORT = ;
-const HOST = 'localhost'; // Replace with your server's IP if not running locally
+const port = 1234;
+const host = 'localhost';
 
-rl.on('line', (line) => {
-  const message = Buffer.from(line);
-  client.send(message, 0, message.length, PORT, HOST, (err) => {
-    if (err) throw err;
-    console.log(`You: ${line}`);
+const client = new net.Socket();
+
+client.connect(port, host, () => {
+  console.log('Connected to chat server');
+  rl.prompt();
+
+  rl.on('line', (line) => {
+    client.write(line);
+    rl.prompt();
   });
 });
 
-client.on('message', (message, remote) => {
-  console.log(`Echo from server: ${remote.address}:${remote.port} - ${message}`);
+client.on('data', (data) => {
+  process.stdout.write('\u001b[2K\u001b[200D'); // Clear the current line and move the cursor to the beginning
+  console.log(data.toString());
+  rl.prompt();
+});
+
+client.on('close', () => {
+  console.log('Connection to chat server closed');
+  process.exit(0);
 });
 
 client.on('error', (err) => {
-  console.log(`client error:\n${err.stack}`);
-  client.close();
+  console.error(`Error: ${err.message}`);
 });
