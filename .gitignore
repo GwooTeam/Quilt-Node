@@ -175,3 +175,4 @@ received.txt
 *.puk
 *.bin
 dmodule
+/External/NodeManager/NodeAuth/config.json
