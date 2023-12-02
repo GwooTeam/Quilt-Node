@@ -1,1 +1,0 @@
-export const SERVER_IP:string = "0.0.0.0";

@@ -73,6 +73,7 @@ function setSendingStdoutToHTML(mainWindow:BrowserWindow){
 }
 
 async function main(){
+    /*
     let loading = new Spinner("TGRID 초기 설정 중");
     loading.start();
     let dockerProvider = new DockerProvider();
@@ -83,8 +84,8 @@ async function main(){
     let dock: Driver<IDocker> = connector.getDriver<IDocker>();
     let image:string = IMAGE_NAME;
     console.log("TGRID is opend. now creat new Window soon.")
-
     assignEvents(dock);
+    */
     await app.whenReady();
     let mainWindow = createWindow();
 
