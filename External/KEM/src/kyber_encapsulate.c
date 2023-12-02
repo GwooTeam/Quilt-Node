@@ -181,6 +181,17 @@ void kyber_encapsulate(const char* puk_path, const char* result_path) {
     // check ssk
     // NS_hex_dump(oSharedSecret[1].pValue, oSharedSecret[1].ulValueLen, (NT_BYTE_PTR) "shared secret1");
 
+    // printf("capsule type: %d\n", oEncryptedData[1].type);
+    // printf("capsule len: %d\n", oEncryptedData[1].ulValueLen);
+    // printf("capsule alloc: %d\n", oEncryptedData[1].bAlloc);
+    // printf("capsule sensitive: %d\n", oEncryptedData[1].bSensitive);
+
+    // printf("ssk type: %d\n", oSharedSecret[1].type);
+    // printf("ssk len: %d\n", oSharedSecret[1].ulValueLen);
+    // printf("ssk alloc: %d\n", oSharedSecret[1].bAlloc);
+    // printf("ssk sensitive: %d\n", oSharedSecret[1].bSensitive);
+    
+
 err:
     NS_clear_object(&oPublicKey, 2);
     NS_clear_object(&oEncryptedData, 2);
