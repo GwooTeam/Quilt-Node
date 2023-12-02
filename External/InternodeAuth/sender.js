@@ -1,37 +1,27 @@
 //tcp server
 const net = require('net');
 
-const clients = [];
 const port = 31245;
-
-const broadcast = (message, sender) => {
-  clients.forEach(client => {
-    // Don't send the message back to the sender
-    if (client !== sender) {
-      client.write(message);
-    }
-  });
-  console.log(message.trim());
-};
+const host = 'localhost';
 
 const server = net.createServer(socket => {
-  console.log('A new client has connected');
-  clients.push(socket);
+    console.log('Client connected');
 
-  socket.on('data', data => {
-    broadcast(`${socket.remoteAddress}:${socket.remotePort} - ${data}`, socket);
-  });
+    socket.on('data', data => {
+        const message = data.toString().trim();
+        if (message === 'auth request') {
+            console.log('Authentication request received');
+            // Generate a random value
+            const randomValue = Math.random().toString(36).substr(2, 9);
+            socket.write(`Random Value: ${randomValue}`);
+        }
+    });
 
-  socket.on('end', () => {
-    clients.splice(clients.indexOf(socket), 1);
-    console.log('A client has disconnected');
-  });
-
-  socket.on('error', error => {
-    console.error(`Error: ${error.message}`);
-  });
+    socket.on('end', () => {
+        console.log('Client disconnected');
+    });
 });
 
-server.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+server.listen(port, host, () => {
+    console.log(`Server listening at ${host}:${port}`);
 });
