@@ -147,6 +147,8 @@ void kyber_encrypt(const char* ssk_path, const char* plain_path, const char* cip
     // oData에 할당
     oData[1].pValue = plainData;
     oData[1].ulValueLen = plain_file_size + padding;
+    
+    free(tmpBuf);
 
     // check oData
     // NS_hex_dump(oData[1].pValue, oData[1].ulValueLen, (NT_BYTE_PTR) "source data");

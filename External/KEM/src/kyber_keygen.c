@@ -137,6 +137,16 @@ void kyber_keygen(const char* key_path) {
     printf("puk length: %d\n", oPublicKey[1].ulValueLen);
     printf("prk length: %d\n", oPrivateKey[1].ulValueLen);
 
+    printf("puk type: %d\n", oPublicKey[1].type);
+    printf("puk len: %d\n", oPublicKey[1].ulValueLen);
+    printf("puk alloc: %d\n", oPublicKey[1].bAlloc);
+    printf("puk sensitive: %d\n", oPublicKey[1].bSensitive);
+
+    printf("prk type: %d\n", oPrivateKey[1].type);
+    printf("prk len: %d\n", oPrivateKey[1].ulValueLen);
+    printf("prk alloc: %d\n", oPrivateKey[1].bAlloc);
+    printf("prk sensitive: %d\n", oPrivateKey[1].bSensitive);
+
 err:
     // puts("into err label");
     NS_clear_object(&oPublicKey, 2);

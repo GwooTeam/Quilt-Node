@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include "nc_api.h"
+#include "quilt_api.h"
 
 /// @brief Dilithium3 Standard
-
 
 /// - security level: Level 3
 /// - matrix computation: No
 /// - symmetric primitive: SHA3
-void dilithium_keygen()
+void dilithium_keygen_raw()
 {
     /**
      * Step 0-1. 타입 지정
@@ -39,9 +39,9 @@ void dilithium_keygen()
      * Step 0-2. 암호모듈 상태 변경
      * 양자내성암호 모듈을 사용하기 위해 현재 암호모듈의 상태를 다음과 같이 변경한다.
      */
-    printf("current status = %d\n", NS_get_state());
+    // printf("current status = %d\n", NS_get_state());
     NS_change_state(NST_MODULE_DISAPPROVAL_PQC);
-    printf("current status = %d\n", NS_get_state());
+    // printf("current status = %d\n", NS_get_state());
 
     /**
      * Step 1. 키 쌍 생성
@@ -55,36 +55,21 @@ void dilithium_keygen()
                                    (NT_OBJECT_PTR)&oPublicKey,
                                    (NT_OBJECT_PTR)&oPrivateKey)) != NRC_OK)
     {
-        printf("NS_generate_keypair failed: %s\n", NS_get_errmsg(ret));
+        fprintf(stderr, "NS_generate_keypair failed: %s\n", NS_get_errmsg(ret));
         goto err;
     }
 
     // 생성된 키 쌍 출력
-    NS_hex_dump(oPublicKey[1].pValue, oPublicKey[1].ulValueLen, (NT_BYTE_PTR) "public key");
-    printf("*pub key len : %d\n",oPublicKey[1].ulValueLen);
+    // NS_hex_dump(oPublicKey[1].pValue, oPublicKey[1].ulValueLen, (NT_BYTE_PTR) "public key");
+    // printf("*pub key len : %d\n",oPublicKey[1].ulValueLen);
     
-    NS_hex_dump(oPrivateKey[1].pValue, oPrivateKey[1].ulValueLen, (NT_BYTE_PTR) "private key"); 
-    printf("*private key len : %d\n\n",oPrivateKey[1].ulValueLen);
+    // NS_hex_dump(oPrivateKey[1].pValue, oPrivateKey[1].ulValueLen, (NT_BYTE_PTR) "private key"); 
+    // printf("*private key len : %d\n\n",oPrivateKey[1].ulValueLen);
 
 
-    // 생성된 키 쌍 public key와 private key 파일을 각각 생성
-    FILE *pub_key_file = fopen("dilithium_key.puk", "wb");
-    if(pub_key_file == NULL) {
-        printf("failed to create puk file.\n");
-        goto err;
-    }
-    fwrite(oPublicKey[1].pValue, oPublicKey[1].ulValueLen, 1, pub_key_file);
-    fclose(pub_key_file);
-    puts("success to create public key file.");
+    printVal("puk=", (unsigned char*)oPublicKey[1].pValue, oPublicKey[1].ulValueLen);
 
-    FILE *priv_key_file = fopen("dilithium_key.prk", "wb");
-    if(priv_key_file == NULL) {
-        printf("failed to create prk file.\n");
-        goto err;
-    }
-    fwrite(oPrivateKey[1].pValue, oPrivateKey[1].ulValueLen, 1, priv_key_file);
-    fclose(priv_key_file);
-    puts("success to create private key file.");
+    printVal("prk=", (unsigned char*)oPrivateKey[1].pValue, oPrivateKey[1].ulValueLen);
 
 
 err:
@@ -92,7 +77,9 @@ err:
     NS_clear_object((NT_OBJECT_PTR)&oPrivateKey, 2);
 }
 
-void dilithium_sign(const char *data_path, const char *prk_path)
+
+
+void dilithium_sign_raw(const char* data_val, const char* prk_val)
 {
     /**
      * Step 0-1. 타입 지정
@@ -137,9 +124,9 @@ void dilithium_sign(const char *data_path, const char *prk_path)
      * Step 0-2. 암호모듈 상태 변경
      * 양자내성암호 모듈을 사용하기 위해 현재 암호모듈의 상태를 다음과 같이 변경한다.
      */
-    printf("current status = %d\n", NS_get_state());
+    // printf("current status = %d\n", NS_get_state());
     NS_change_state(NST_MODULE_DISAPPROVAL_PQC);
-    printf("current status = %d\n", NS_get_state());
+    // printf("current status = %d\n", NS_get_state());
 
    
     /**
@@ -151,49 +138,32 @@ void dilithium_sign(const char *data_path, const char *prk_path)
      */
     
     /*개인키 파일 열어 키 값 읽어오기*/
-    oPrivateKey[1].ulValueLen = 4000;
-    NT_VOID_PTR prk_value = (NT_VOID_PTR)calloc(oPrivateKey[1].ulValueLen, 1);
-    
-    FILE* prk_file;
-    prk_file = fopen(prk_path, "rb");
-    if(prk_file == NULL) {
-        puts("failed to open private key...");
-        goto err;
-    }
-    fread(prk_value, 4000, 1, prk_file);
-    fclose(prk_file);
 
-    oPrivateKey[1].pValue = prk_value;
-    // check private key
-    NS_hex_dump(oPrivateKey[1].pValue, oPrivateKey[1].ulValueLen, (NT_BYTE_PTR) "private key");
-    printf("\n");
+    size_t prk_size = strlen(prk_val) / 2;
+
+    oPrivateKey[1].pValue = (NT_VOID_PTR)calloc(prk_size, 1);
+    hexToByte(prk_val, (unsigned char*)oPrivateKey[1].pValue, prk_size);
+    
+    oPrivateKey[1].type = NAT_VALUE;
+    oPrivateKey[1].ulValueLen = prk_size;
+    oPrivateKey[1].bAlloc = TRUE;
+    oPrivateKey[1].bSensitive = TRUE;
 
 
     /*서명 전 초기 작업*/
     if ((ret = NS_sign_init(&signctx,
                             (NT_OBJECT_PTR)&oPrivateKey)) != NRC_OK)
     {
-        printf("NS_sign_init failed: %s\n", NS_get_errmsg(ret));
+        fprintf(stderr, "NS_sign_init failed: %s\n", NS_get_errmsg(ret));
         goto err;
     }
 
 
-    /*서명 대상 데이터 파일 읽어오기*/
-    FILE *data_file = fopen(data_path, "r"); // 파일을 읽기 모드로 열기
-    if (data_file == NULL) {
-        printf("failed to open data file.\n");
-    }
-    if (fgets(DataBuf, sizeof(DataBuf), data_file) != NULL) {
-        // 줄 바꿈 문자 제거
-        size_t len = strlen(DataBuf);
-        if (len > 0 && DataBuf[len - 1] == '\n') {
-            DataBuf[len - 1] = '\0';
-        }
-    } else {
-        printf("fail to read data from file.\n");
-    }
-    fclose(data_file);
-    printf("### data.txt : \n %s\n",DataBuf);
+    oData[1].type = NAT_VALUE;
+    oData[1].pValue = (NT_VOID_PTR)data_val;
+    oData[1].ulValueLen = strlen(data_val);
+    oData[1].bAlloc = FALSE;
+    oData[1].bSensitive = FALSE;
 
 
     /**
@@ -208,23 +178,15 @@ void dilithium_sign(const char *data_path, const char *prk_path)
                        (NT_OBJECT_PTR)&oData,
                        (NT_OBJECT_PTR)&oSignData)) != NRC_OK)
     {
-        printf("NS_sign failed: %s\n", NS_get_errmsg(ret));
+        fprintf(stderr, "NS_sign failed: %s\n", NS_get_errmsg(ret));
         goto err;
     }
     
-    NS_hex_dump(oSignData[1].pValue,oSignData[1].ulValueLen, (NT_BYTE_PTR) "signed data");
+    // NS_hex_dump(oSignData[1].pValue,oSignData[1].ulValueLen, (NT_BYTE_PTR) "signed data");
 
-    /*서명 내용 파일로 저장*/
-    FILE *signed_file = fopen("dilithium_signed.bin", "wb");
-    if(signed_file == NULL) {
-        printf("failed to create signed file.\n");
-        goto err;
-    }
-    fwrite(oSignData[1].pValue,
-                oSignData[1].ulValueLen, 1, signed_file);
-    fclose(signed_file);
-    puts("\n\nsuccess to create signed file!\n");
-    printf("signed file len : %d\n",oSignData[1].ulValueLen);
+    /*서명 내용 표준 출력*/
+    printVal("sign=",(unsigned char*)oSignData[1].pValue, oSignData[1].ulValueLen);
+    
 
 err:
     NS_clear_object((NT_OBJECT_PTR)&oPublicKey, 2);
@@ -232,12 +194,14 @@ err:
     NS_clear_object((NT_OBJECT_PTR)&oSignData, 2);
 }
 
-int dilithium_verify(const char *data_file_path, const char *signed_path, const char *puk_path)
+
+
+int dilithium_verify_raw(const char* data_val, const char* sign_val, const char* puk_val)
 {
     /**
      * Step 0-1. 타입 지정
      */
-    int return_code = 1; // 0은 성공, 1은 실패 
+    int exitCode = 1; // 0은 성공, 1은 실패 
     NT_ULONG puk_type = NOB_PUBLIC_KEY;               /* pk type*/
     NT_ULONG prk_type = NOB_PRIVATE_KEY;              /* sk type*/
     NT_ULONG sig_type = NOB_CTX_DILITHIUM;            /* sig type*/
@@ -279,9 +243,9 @@ int dilithium_verify(const char *data_file_path, const char *signed_path, const 
      * Step 0-2. 암호모듈 상태 변경
      * 양자내성암호 모듈을 사용하기 위해 현재 암호모듈의 상태를 다음과 같이 변경한다.
      */
-    printf("current status = %d\n", NS_get_state());
+    // printf("current status = %d\n", NS_get_state());
     NS_change_state(NST_MODULE_DISAPPROVAL_PQC);
-    printf("current status = %d\n", NS_get_state());
+    // printf("current status = %d\n", NS_get_state());
 
    
     /**
@@ -293,53 +257,39 @@ int dilithium_verify(const char *data_file_path, const char *signed_path, const 
      */
 
     /*공개키 파일 열어 키 값 읽어오기*/
-    oPublicKey[1].ulValueLen = 1952;
-    NT_VOID_PTR puk_value = (NT_VOID_PTR)calloc(oPublicKey[1].ulValueLen, 1);
-    FILE* puk_file;
-    puk_file = fopen(puk_path, "rb");
-    if(puk_file == NULL) {
-        puts("failed to open public key...");
-        
-        goto err;
-    }
-    fread(puk_value, 1952, 1, puk_file);
-    fclose(puk_file);
-    oPublicKey[1].pValue = puk_value;
+    // oPublicKey[1].ulValueLen = 1952;
+
+    size_t puk_size = strlen(puk_val) / 2;
+    oPublicKey[1].pValue = (NT_VOID_PTR)calloc(puk_size, 1);
+    hexToByte(puk_val, (unsigned char*) oPublicKey[1].pValue, puk_size);
+    
+    oPublicKey[1].type = NAT_VALUE;
+    oPublicKey[1].ulValueLen = puk_size;
+    oPublicKey[1].bAlloc = FALSE;
+    oPublicKey[1].bSensitive = FALSE;
+
     // check public key
-    NS_hex_dump(oPublicKey[1].pValue, oPublicKey[1].ulValueLen, (NT_BYTE_PTR) "public key");
+    // NS_hex_dump(oPublicKey[1].pValue, oPublicKey[1].ulValueLen, (NT_BYTE_PTR) "public key");
    
 
-    /*서명 대상 데이터 파일 읽어오기*/
-    FILE *data_file = fopen(data_file_path, "r"); 
-    if (data_file == NULL) {
-        printf("failed to open data file.\n");
-        return 1;
-    }
-    if (fgets(DataBuf, sizeof(DataBuf), data_file) != NULL) {
-        // 줄 바꿈 문자 제거
-        size_t len = strlen(DataBuf);
-        if (len > 0 && DataBuf[len - 1] == '\n') {
-            DataBuf[len - 1] = '\0';
-        }
-    } else {
-        printf("fail to read data from file.\n");
-    }
-    fclose(data_file);
-    // printf("### data.txt : \n %s\n",DataBuf);
+    /*원본 데이터 읽어오기*/
+    oData[1].type = NAT_VALUE;
+    oData[1].pValue = (NT_VOID_PTR)data_val;
+    oData[1].ulValueLen = strlen(data_val);
+    oData[1].bAlloc = FALSE;
+    oData[1].bSensitive = FALSE;
 
 
     /*서명된 파일 불러오기*/
-    oSignData[1].ulValueLen = 4000;
-    NT_VOID_PTR sign_data = (NT_VOID_PTR)calloc(oSignData[1].ulValueLen, 1);
-    FILE* sign_file;
-    sign_file = fopen(signed_path, "rb");
-    if(sign_file == NULL) {
-        puts("fail to open sign data...");
-        goto err;
-    }
-    fread(sign_data, 4000, 1, sign_file);
-    fclose(sign_file);
-    oSignData[1].pValue = sign_data;
+    size_t sign_size = strlen(sign_val) / 2; // 4000
+    oSignData[1].pValue = (NT_VOID_PTR)calloc(sign_size, 1); // allocate 4000byte
+    hexToByte(sign_val, (unsigned char*)oSignData[1].pValue, sign_size);
+
+    oSignData[1].type = NAT_VALUE;
+    oSignData[1].ulValueLen = sign_size;
+    oSignData[1].bAlloc = FALSE;
+    oSignData[1].bSensitive = FALSE;
+    
     // check signed data
     //NS_hex_dump(oSignData[1].pValue, oSignData[1].ulValueLen, (NT_BYTE_PTR) "sign data");
 
@@ -348,7 +298,7 @@ int dilithium_verify(const char *data_file_path, const char *signed_path, const 
     if ((ret = NS_verify_init(&signctx,
                               (NT_OBJECT_PTR)&oPublicKey)) != NRC_OK)
     {
-        printf("NS_verify_init failed: %s\n", NS_get_errmsg(ret));
+        fprintf(stderr, "NS_verify_init failed: %s\n", NS_get_errmsg(ret));
         goto err;
     }
 
@@ -364,16 +314,16 @@ int dilithium_verify(const char *data_file_path, const char *signed_path, const 
                          (NT_OBJECT_PTR)&oData,
                          (NT_OBJECT_PTR)&oSignData)) != NRC_OK)
     {
-        printf("NS_verify failed: %s\n", NS_get_errmsg(ret));
+        fprintf(stderr, "NS_verify failed: %s\n", NS_get_errmsg(ret));
         goto err;
     }
 
-    printf("\nsuccess verify !!\n");
-    return_code = 0;
+    // printf("\nsuccess verify !!\n");
+    exitCode = 0;
 
 err:
     NS_clear_object((NT_OBJECT_PTR)&oPublicKey, 2);
     NS_clear_object((NT_OBJECT_PTR)&oPrivateKey, 2);
     NS_clear_object((NT_OBJECT_PTR)&oSignData, 2);
-    return return_code;
+    return exitCode;
 }
