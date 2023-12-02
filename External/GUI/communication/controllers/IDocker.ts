@@ -12,6 +12,7 @@ export enum CodeLanguage{
 }
 
 export interface IDocker{
+    [key: string]: Function;
     pullImage(image: string): void;
     createContainer(image: string, cmd?: string[]): void;
     startContainer(): void;
