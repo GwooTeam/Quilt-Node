@@ -5,9 +5,11 @@ const fs = require('fs');
 const port = 31245;
 const host = 'localhost';
 
-const server = net.createServer(socket => {
+const socket = new net.Socket();
+
+
+const textServer = net.createServer(socket => {
     console.log('Client connected');
-    let fileWriteStream;
     socket.on('data', data => {
         const message = data.toString().trim();
         if (message === 'auth request') {
@@ -18,15 +20,39 @@ const server = net.createServer(socket => {
 
            // Send the random value to the client
            socket.write(`Random Value: ${randomValue}`);
-            
         }
+        }
+      )
     });
 
-    socket.on('end', () => {
+  socket.on('end', () => {
         console.log('Client disconnected');
     });
+
+  socket.on('error', (error) => {
+      console.error(`Error: ${error.message}`);
+    });
+
+textServer.listen(port, host, () => {
+    console.log(`Server listening at ${host}:${port}`);
 });
 
-server.listen(port, host, () => {
-    console.log(`Server listening at ${host}:${port}`);
+
+// File transfer server
+const fileServer = net.createServer(socket => {
+  console.log('File transfer connection established');
+  const fileWriteStream = fs.createWriteStream('receivedFile.txt');
+
+  socket.on('data', data => {
+      fileWriteStream.write(data);
+  });
+
+  socket.on('end', () => {
+      fileWriteStream.end();
+      console.log('File transfer completed');
+  });
+});
+
+fileServer.listen(31246, 'localhost', () => {
+  console.log('File server listening on port 31246');
 });

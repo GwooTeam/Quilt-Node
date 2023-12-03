@@ -1,11 +1,69 @@
-//tcp client
 const net = require('net');
 const { exec } = require('child_process');
 const readline = require('readline');
 const fs = require('fs');
 
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
-const keygen_sign = () => {
+const config = require('./config.json');
+const textPort = config.server_port; // Port for text communication
+const filePort = config.file_port; // Port for file transfer
+const host = config.server_ip;
+
+const textClient = new net.Socket();
+
+textClient.connect(textPort, host, () => {
+    console.log('Connected to the text server');
+    rl.prompt();
+
+    rl.on('line', (line) => {
+        textClient.write(line);
+        rl.prompt();
+    });
+});
+
+textClient.on('data', (data) => {
+    const message = data.toString().trim();
+    console.log(`Server: ${message}`);
+
+    // Check if the message is a random value
+    if (message.startsWith('Random Value: ')) {
+        const randomValue = message.split('Random Value: ')[1];
+        handleNonceSign(randomValue);
+    }
+
+    rl.prompt();
+});
+
+textClient.on('close', () => {
+    console.log('Connection to the text server closed');
+    rl.close();
+});
+
+textClient.on('error', (err) => {
+    console.error(`Error: ${err.message}`);
+});
+
+function handleNonceSign(randomValue) {
+    console.log('Executing keygen_sign...');
+    keygen_sign();
+
+    console.log('Saving random value to nonce.txt and executing nonce_sign...');
+    fs.writeFile('nonce.txt', randomValue, (err) => {
+        if (err) {
+            console.error(`Error writing to file: ${err}`);
+            return;
+        }
+        nonce_sign(() => {
+            sendFile('exampleFile.txt'); // Replace 'exampleFile.txt' with your actual file name
+        });
+    });
+}
+
+function keygen_sign() {
     exec('./dmodule --keygen', (error, stdout, stderr) => {
         if (error) {
             console.error(`Execution error: ${error.message}`);
@@ -17,85 +75,40 @@ const keygen_sign = () => {
         }
         console.log(`keygen_sign Output: ${stdout}`);
     });
-};
-
-const nonce_sign = (callback) => {
-  exec('./dmodule -s nonce.txt dilithium_key.prk', (error, stdout, stderr) => {
-      if (error) {
-          console.error(`Execution error: ${error.message}`);
-          return;
-      }
-      if (stderr) {
-          console.error(`Stderr: ${stderr}`);
-          return;
-      }
-      console.log(`nonce_sign Output: ${stdout}`);
-      if (callback) {
-        callback(); // Call the callback function once execution is complete
-    }
-  });
-};
-
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-const config = require('./config.json');
-const port = config.server_port;
-const host = config.server_ip;
-
-const client = new net.Socket();
-
-client.connect(port, host, () => {
-    console.log('Connected to chat server');
-    rl.prompt();
-
-    rl.on('line', (line) => {
-        client.write(line);
-        rl.prompt();
-    });
-});
-
-client.on('data', (data) => {
-  const message = data.toString().trim();
-  console.log(`\nServer: ${message}`);
-  // Check if the message is a random value
-  if (message.startsWith('Random Value: ')) {
-      const randomValue = message.split('Random Value: ')[1];
-      console.log('Executing printhello program...');
-      keygen_sign();
-
-      // Write the random value to a file
-      fs.writeFile('nonce.txt', randomValue, (err) => {
-          if (err) {
-              console.error(`Error writing to file: ${err}`);
-          } else {
-              console.log('Random value saved to nonce.txt');
-
-          }
-      });
-  }
-  rl.prompt();
-});
-
-// Function to send a file
-function sendFile(filePath) {
-  const readStream = fs.createReadStream(filePath);
-  readStream.on('open', () => {
-      readStream.pipe(client);
-  });
-  readStream.on('error', (err) => {
-      console.error(`Error reading file: ${err}`);
-  });
 }
 
+function nonce_sign(callback) {
+    exec('./dmodule -s nonce.txt dilithium_key.prk', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Execution error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`Stderr: ${stderr}`);
+            return;
+        }
+        console.log(`nonce_sign Output: ${stdout}`);
+        if (callback) {
+            callback();
+        }
+    });
+}
 
-client.on('close', () => {
-    console.log('Connection to chat server closed');
-    process.exit(0);
-});
-
-client.on('error', (err) => {
-    console.error(`Error: ${err.message}`);
-});
+function sendFile(filePath) {
+    const fileClient = new net.Socket();
+    fileClient.connect(31246, host, () => {
+        console.log(`Connected to the file server for sending ${filePath}`);
+        const readStream = fs.createReadStream(filePath);
+        readStream.on('open', () => {
+            readStream.pipe(fileClient);
+        });
+        readStream.on('end', () => {
+            fileClient.end();
+            console.log(`${filePath} has been sent`);
+        });
+        readStream.on('error', (err) => {
+            console.error(`Error reading file: ${err}`);
+            fileClient.end();
+        });
+    });
+}
