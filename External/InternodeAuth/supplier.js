@@ -58,7 +58,9 @@ function handleNonceSign(randomValue) {
             return;
         }
         nonce_sign(() => {
-            sendFile('dilithium_signed.bin', verifySignature); // Replace 'exampleFile.txt' with your actual file name
+            sendFile('dilithium_signed.bin', () => {
+              sendFile('dilithium_key.puk');
+            }); // Replace 'exampleFile.txt' with your actual file name
         });
     });
 }
@@ -94,7 +96,7 @@ function nonce_sign(callback) {
     });
 }
 
-function sendFile(filePath, afterSendCallback) {
+function sendFile(filePath, callback) {
     const fileClient = new net.Socket();
     fileClient.connect(31246, host, () => {
         console.log(`Connected to the file server for sending ${filePath}`);
@@ -102,13 +104,12 @@ function sendFile(filePath, afterSendCallback) {
         readStream.on('open', () => {
             readStream.pipe(fileClient);
         });
-        console.log(readStream);
         readStream.on('end', () => {
             fileClient.end();
             console.log(`${filePath} has been sent`);
-            if (afterSendCallback) {
-              afterSendCallback(); // Execute the callback after file has been sent
-          }
+            if (callback) {
+              callback();
+            }
         });
         readStream.on('error', (err) => {
             console.error(`Error reading file: ${err}`);
@@ -117,21 +118,6 @@ function sendFile(filePath, afterSendCallback) {
     });
 }
 
-
-
-function verifySignature() {
-  exec('./dmodule -v nonce.txt dilithium_signed.bin dilithium_key.puk', (error, stdout, stderr) => {
-      if (error) {
-          console.error(`Execution error: ${error.message}`);
-          return;
-      }
-      if (stderr) {
-          console.error(`Stderr: ${stderr}`);
-          return;
-      }
-      console.log(`Verification Output: ${stdout}`);
-  });
-}
 
 
 
