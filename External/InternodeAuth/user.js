@@ -3,8 +3,12 @@ const net = require('net');
 const fs = require('fs');
 const { exec } = require('child_process');
 
-const port = 31245;
-const host = 'localhost';
+
+
+const config = require('./config.json');
+const host = config.supplier_ip;
+const textPort = config.supplier_txt_port;
+const filePort = config.supplier_file_port; 
 
 const socket = new net.Socket();
 
@@ -34,8 +38,8 @@ const textServer = net.createServer(socket => {
       console.error(`Error: ${error.message}`);
     });
 
-textServer.listen(port, host, () => {
-    console.log(`Server listening at ${host}:${port}`);
+textServer.listen(textPort, host, () => {
+    console.log(`Server listening at ${host}:${textPort}`);
 });
 
 
@@ -59,11 +63,9 @@ const fileServer = net.createServer(socket => {
       console.error(`Error: ${error.message}`);
   });
   nonce_verify();
-
-
 });
 
-fileServer.listen(31246, 'localhost', () => {
+fileServer.listen(filePort, host, () => {
   console.log('File server listening on port 31246');
 });
 
