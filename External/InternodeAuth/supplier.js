@@ -9,9 +9,9 @@ const rl = readline.createInterface({
 });
 
 const config = require('./config.json');
-const textPort = config.server_port; // Port for text communication
-const filePort = config.file_port; // Port for file transfer
-const host = config.server_ip;
+const host = config.user_ip;
+const textPort = config.user_txt_port; // Port for text communication
+const filePort = config.user_file_port; // Port for file transfer
 
 const textClient = new net.Socket();
 
@@ -57,11 +57,6 @@ function handleNonceSign(randomValue) {
             console.error(`Error writing to file: ${err}`);
             return;
         }
-        nonce_sign(() => {
-            sendFile('dilithium_signed.bin', () => {
-              sendFile('dilithium_key.puk');
-            }); // Replace 'exampleFile.txt' with your actual file name
-        });
     });
 }
 
@@ -77,10 +72,11 @@ function keygen_sign() {
         }
         console.log(`keygen_sign Output: ${stdout}`);
     });
+    nonce_sign();
 }
 
-function nonce_sign(callback) {
-    exec('./dmodule -s nonce.txt dilithium_key.prk', (error, stdout, stderr) => {
+function nonce_sign() {
+    exec('node sign.js', (error, stdout, stderr) => {
         if (error) {
             console.error(`Execution error: ${error.message}`);
             return;
@@ -90,15 +86,16 @@ function nonce_sign(callback) {
             return;
         }
         console.log(`nonce_sign Output: ${stdout}`);
-        if (callback) {
-            callback();
-        }
+        
+        sendFile('./dilithium_signed.bin');
     });
 }
 
-function sendFile(filePath, callback) {
+
+
+function sendFile(filePath) {
     const fileClient = new net.Socket();
-    fileClient.connect(31246, host, () => {
+    fileClient.connect(filePort, host, () => {
         console.log(`Connected to the file server for sending ${filePath}`);
         const readStream = fs.createReadStream(filePath);
         readStream.on('open', () => {
@@ -107,9 +104,6 @@ function sendFile(filePath, callback) {
         readStream.on('end', () => {
             fileClient.end();
             console.log(`${filePath} has been sent`);
-            if (callback) {
-              callback();
-            }
         });
         readStream.on('error', (err) => {
             console.error(`Error reading file: ${err}`);

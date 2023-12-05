@@ -8,7 +8,6 @@ const host = 'localhost';
 
 const socket = new net.Socket();
 
-let fileCount = 0; // To keep track of the number of files received
 
 const textServer = net.createServer(socket => {
     console.log('Client connected');
@@ -43,32 +42,23 @@ textServer.listen(port, host, () => {
 // File transfer server
 const fileServer = net.createServer(socket => {
   console.log('File transfer connection established');
-  let fileWriteStream;
+  // 'receivedFile.bin' 파일에 데이터 쓰기
+  const fileWriteStream = fs.createWriteStream('receivedFile.bin');
+
 
   socket.on('data', data => {
-    if (!fileWriteStream) {
-        // Determine the filename based on the order of files received
-        const filename = fileCount === 0 ? 'receivedFile.txt' : 'received_key.puk';
-        fileWriteStream = fs.createWriteStream(filename);
-        console.log(`Receiving file: ${filename}`);
-    }
-    fileWriteStream.write(data);
+      fileWriteStream.write(data);
   });
 
-socket.on('end', () => {
-    fileWriteStream.end();
-    console.log('File transfer completed');
-
-    fileCount++; // Increment the file count
-
-    // Optionally, call verifySignature here if this is the second file
-    if (fileCount === 2) {
-        verifySignature();
-    }
+  socket.on('end', () => {
+      fileWriteStream.end();
+      console.log('File transfer completed, receivedFile.bin saved');
   });
-  socket.on('error', (error) => {
-    console.error(`Error: ${error.message}`);
+
+  socket.on('error', error => {
+      console.error(`Error: ${error.message}`);
   });
+  nonce_verify();
 
 
 });
@@ -77,9 +67,8 @@ fileServer.listen(31246, 'localhost', () => {
   console.log('File server listening on port 31246');
 });
 
-// Function to verify the signature
-function verifySignature() {
-  exec('./dmodule -v nonce.txt receivedFile.txt received_key.puk', (error, stdout, stderr) => {
+function nonce_verify() {
+  exec('node verify.js', (error, stdout, stderr) => {
       if (error) {
           console.error(`Execution error: ${error.message}`);
           return;
@@ -88,6 +77,6 @@ function verifySignature() {
           console.error(`Stderr: ${stderr}`);
           return;
       }
-      console.log(`Verification Output: ${stdout}`);
+      console.log(`nonce_verify Output: ${stdout}`);
   });
 }
