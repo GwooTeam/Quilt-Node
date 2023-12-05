@@ -10,6 +10,9 @@ const host = config.supplier_ip;
 const textPort = config.supplier_txt_port;
 const filePort = config.supplier_file_port; 
 
+let fileReceivedCount = 0; 
+
+
 const socket = new net.Socket();
 
 
@@ -46,23 +49,29 @@ textServer.listen(textPort, host, () => {
 // File transfer server
 const fileServer = net.createServer(socket => {
   console.log('File transfer connection established');
-  // 'receivedFile.bin' 파일에 데이터 쓰기
-  const fileWriteStream = fs.createWriteStream('receivedFile.bin');
-
-
+  let fileWriteStream;
   socket.on('data', data => {
-      fileWriteStream.write(data);
-  });
+    if (!fileWriteStream) {
+        const filename = fileReceivedCount === 0 ? 'received_dilithium_key.puk' : 'receivedFile.bin';
+        fileWriteStream = fs.createWriteStream(filename);
+        console.log(`Receiving and saving to ${filename}`);
+    }
+    fileWriteStream.write(data);
+});
 
   socket.on('end', () => {
       fileWriteStream.end();
-      console.log('File transfer completed, receivedFile.bin saved');
+      console.log('File transfer completed');
+      fileReceivedCount++;
+
+      if (fileReceivedCount === 2) { // 두 번째 파일 수신 후 verify 실행
+          nonce_verify();
+      }
   });
 
   socket.on('error', error => {
       console.error(`Error: ${error.message}`);
   });
-  nonce_verify();
 });
 
 fileServer.listen(filePort, host, () => {
