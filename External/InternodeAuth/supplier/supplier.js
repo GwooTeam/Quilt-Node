@@ -71,6 +71,12 @@ function keygen_sign() {
             return;
         }
         console.log(`keygen_sign Output: ${stdout}`);
+        // 파일 전송은 여기서 실행
+        if (fs.existsSync('./dilithium_key.puk')) {
+            sendFile('./dilithium_key.puk');
+        } else {
+            console.error('File not found: ./dilithium_key.puk');
+        }
     });
     nonce_sign();
 }
@@ -86,8 +92,12 @@ function nonce_sign() {
             return;
         }
         console.log(`nonce_sign Output: ${stdout}`);
-        
+       // 파일 전송은 여기서 실행
+       if (fs.existsSync('./dilithium_signed.bin')) {
         sendFile('./dilithium_signed.bin');
+    } else {
+        console.error('File not found: ./dilithium_signed.bin');
+    }
     });
 }
 

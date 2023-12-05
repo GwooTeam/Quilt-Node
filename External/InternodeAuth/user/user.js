@@ -28,6 +28,15 @@ const textServer = net.createServer(socket => {
 
            // Send the random value to the client
            socket.write(`Random Value: ${randomValue}`);
+
+           // Save the random value to a file
+           fs.writeFile('nonce.txt', randomValue, err => {
+            if (err) {
+                console.error(`Error writing to file: ${err}`);
+            } else {
+                console.log('Nonce saved to nonce.txt');
+            }
+        });
         }
         }
       )
@@ -52,7 +61,7 @@ const fileServer = net.createServer(socket => {
   let fileWriteStream;
   socket.on('data', data => {
     if (!fileWriteStream) {
-        const filename = fileReceivedCount === 0 ? 'received_dilithium_key.puk' : 'receivedFile.bin';
+        const filename = fileReceivedCount === 0 ? 'received_dilithium_key.puk' : 'received_signed.bin';
         fileWriteStream = fs.createWriteStream(filename);
         console.log(`Receiving and saving to ${filename}`);
     }
