@@ -89,7 +89,7 @@ const fileServer = net.createServer(socket => {
    // const encryptFilePath = 'userResource/kyber_encrypted.bin';
    // const content = fs.readFileSync(encryptFilePath);
     // socket.write(content);
-    console.log('data transfer end: ' + (new Date()).getTime());
+    // console.log('data transfer end: ' + (new Date()).getTime());
     console.log('File transfer completed');
     socket.end();
   });

@@ -106,6 +106,8 @@ fileClient.on('data', (data) => {
 });
 
 
+let endTime;
+
 fileClient.on('end', () => {
     
     // 서버에서 받은 작업 완료된 파일을 클라이언트에 저장
@@ -123,6 +125,8 @@ fileClient.on('end', () => {
     console.log('line 131');
 
     ssk_decrypt(ssk_path, enc_path, result_path);
+
+    endTime = new Date().getTime();
     
 })
 
@@ -133,53 +137,15 @@ const puk_path = 'suppResource/kyber_key.puk';
 const capsule_save_path = 'suppResource/';
 const capsule_file_path = 'suppResource/kyber_encapsulated.cap';
 
+let startTime;
 async function runFunctions() {
-    console.log('capsulation start: ' + (new Date()).getTime());
+    startTime = new Date().getTime();
     await kem_encapsulate(puk_path, capsule_save_path);
     await sendFile(capsule_file_path);
 }
 
 runFunctions();
 
-// kem_encapsulate(puk_path, capsule_save_path)
-
-// sendFile(capsule_file_path);
-
-
-// function handleNonceSign(randomValue) {
-//     console.log('Executing keygen_sign...');
-//     keygen_sign();
-
-//     console.log('Saving random value to nonce.txt and executing nonce_sign...');
-//     fs.writeFile('nonce.txt', randomValue, (err) => {
-//         if (err) {
-//             console.error(`Error writing to file: ${err}`);
-//             return;
-//         }
-//         nonce_sign(() => {
-//             sendFile('dilithium_signed.bin', () => {
-//               sendFile('dilithium_key.puk');
-//             }); // Replace 'exampleFile.txt' with your actual file name
-//         });
-//     });
-// }
-
-
-// function nonce_sign(callback) {
-//     exec('./dmodule -s nonce.txt dilithium_key.prk', (error, stdout, stderr) => {
-//         if (error) {
-//             console.error(`Execution error: ${error.message}`);
-//             return;
-//         }
-//         if (stderr) {
-//             console.error(`Stderr: ${stderr}`);
-//             return;
-//         }
-//         console.log(`nonce_sign Output: ${stdout}`);
-//         if (callback) {
-//             callback();
-//         }
-//     });
-// }
+console.log('total time: ' + endTime - startTime + 'ms');
 
 
