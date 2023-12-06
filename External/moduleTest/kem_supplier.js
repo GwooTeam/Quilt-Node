@@ -9,51 +9,23 @@ const rl = readline.createInterface({
 });
 
 const config = require('./supplier_config.json');
-const textPort = config.server_text_port; // Port for text communication
 const filePort = config.server_file_port; // Port for file transfer
 const host = config.server_ip;
+const fileClient = new net.Socket();
 
 
-/* ############### server connect ################ */
-const textClient = new net.Socket();
+/* paths */
+const puk_path = 'suppResource/kyber_key.puk';
+const capsule_save_path = 'suppResource/';
+const capsule_file_path = 'suppResource/kyber_encapsulated.cap';
+const ssk_path = 'suppResource/kyber_sharedSecret.ssk';
+const enc_path = 'suppResource/received_encrypted.bin';
+const result_path = 'suppResource/';
 
 
-textClient.connect(textPort, host, () => {
-    console.log('Connected to the text server');
-    rl.prompt();
-
-    rl.on('line', (line) => {
-        textClient.write(line);
-        rl.prompt();
-    });
-});
-
-textClient.on('data', (data) => {
-    const message = data.toString().trim();
-    console.log(`Server: ${message}`);
-
-    // Check if the message is a random value
-    if (message.startsWith('Random Value: ')) {
-        const randomValue = message.split('Random Value: ')[1];
-        handleNonceSign(randomValue);
-    }
-
-    rl.prompt();
-});
-
-textClient.on('close', () => {
-    console.log('Connection to the text server closed');
-    rl.close();
-});
-
-textClient.on('error', (err) => {
-    console.error(`Error: ${err.message}`);
-});
 
 
-/* ##################### functions ####################### */
-
-
+/*  functions  */
 function kem_encapsulate(pukPath, result_path) {
     execSync(`../KEM/modules/kmodule -f --encap --key=${pukPath} --result=${result_path}`, (error, stdout, stderr) => {
         if (error) {
@@ -64,7 +36,7 @@ function kem_encapsulate(pukPath, result_path) {
             console.error(`Stderr: ${stderr}`);
             return;
         }
-        console.log(`kem_encapsulate Output: ${stdout}`);
+        // console.log(`kem_encapsulate Output: ${stdout}`);
     });
 }
 
@@ -82,16 +54,13 @@ function ssk_decrypt(ssk_path, file_path, result_path) {
         console.log(`ssk_decrypt Output: ${stdout}`);
     });
 
-    console.log(res.toString());
+    // console.log(res.toString());
 }
-
-
-const fileClient = new net.Socket();
 
 function sendFile(filePath, callback) {
 
     fileClient.connect(filePort, host, () => {
-        console.log(`Connected to the file server for sending ${filePath}`);
+        // console.log(`Connected to the file server for sending ${filePath}`);
         const fileContent = fs.readFileSync(filePath);
 
         fileClient.write(fileContent);
@@ -100,42 +69,38 @@ function sendFile(filePath, callback) {
 }
 
 
+
+/* receive data from User */
 let receivedData = Buffer.from([]);
 fileClient.on('data', (data) => {
     receivedData = Buffer.concat([receivedData, data]);
 });
 
 
-let endTime;
-
+/* end of socket */
 fileClient.on('end', () => {
-    
     // 서버에서 받은 작업 완료된 파일을 클라이언트에 저장
-    const filename = 'suppResource/received_encrypted.bin';
-    fs.writeFileSync(filename, receivedData);
-    console.log('File transfer completed');
+    fs.writeFileSync(enc_path, receivedData);
+    // console.log('File transfer completed');
 
     // 소켓 연결 종료
     fileClient.end();
     fileClient.destroy();
 
-    const ssk_path = 'suppResource/kyber_sharedSecret.ssk';
-    const enc_path = 'suppResource/received_encrypted.bin';
-    const result_path = 'suppResource/';
-    console.log('line 131');
-
-    ssk_decrypt(ssk_path, enc_path, result_path);
-
-    endTime = new Date().getTime();
+    if(fs.existsSync(enc_path)) {
+        ssk_decrypt(ssk_path, enc_path, result_path);
+        let endTime = new Date().getTime();
+        console.log('total time: ' + (endTime - startTime) + 'ms');
+    }
+    else {
+        console.log('오류: User로부터 암호화된 데이터를 받지 못함.');
+    }
     
 })
 
 
 
-/* ############### send file ############### */
-const puk_path = 'suppResource/kyber_key.puk';
-const capsule_save_path = 'suppResource/';
-const capsule_file_path = 'suppResource/kyber_encapsulated.cap';
+/* start KEM */
 
 let startTime;
 async function runFunctions() {
@@ -146,6 +111,6 @@ async function runFunctions() {
 
 runFunctions();
 
-console.log('total time: ' + endTime - startTime + 'ms');
+
 
 
