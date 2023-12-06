@@ -1,5 +1,5 @@
-#ifndef _EXAMPLE_H_
-#define _EXAMPLE_H_
+#ifndef _QUILT_DILITHIUM_H_
+#define _QUILT_DILITHIUM_H_
 
 /**
  * PQC 예제 코드(간소화 버전)
@@ -7,6 +7,6 @@
  */
 void dilithium_keygen();
 void dilithium_sign();
-void dilithium_verify();
+int dilithium_verify();
 
 #endif /* _EXAMPLE_H_ */

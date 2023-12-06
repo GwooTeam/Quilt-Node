@@ -9,6 +9,12 @@
 #include "kyber_encrypt.h"
 #include "kyber_decrypt.h"
 
+#include "kyber_keygen_raw.h"
+#include "kyber_encapsulate_raw.h"
+#include "kyber_decapsulate_raw.h"
+#include "kyber_encrypt_raw.h"
+#include "kyber_decrypt_raw.h"
+
 // 프로그램 전달 인수로 뭘 넣을지는 아직 정의되지 않음.
 int main(int argc, char* argv[]) {
 
@@ -21,10 +27,14 @@ int main(int argc, char* argv[]) {
     unsigned int flag_encrypt = 0;
     unsigned int flag_decrypt = 0;
 
+    unsigned int flag_file = 0;
+    unsigned int flag_raw = 0;
+
     // args. must be NULL.
     char* key = NULL;
     char* target = NULL;
     char* result = NULL;
+    char* type = NULL;
 
     // strcut option의 배열 long_options[]
     // 여기는 긴 옵션 (--)들 설정
@@ -44,7 +54,7 @@ int main(int argc, char* argv[]) {
     
 
     // 짧은 옵션(-)은 그냥 여기서 switch case로 넣으면 됨. ab: 문자열이랑 같이.
-    while ((option = getopt_long(argc, argv, "", long_options, NULL)) != -1) {
+    while ((option = getopt_long(argc, argv, "fr", long_options, NULL)) != -1) {
         switch (option) {
         // key
         case '1':
@@ -59,6 +69,18 @@ int main(int argc, char* argv[]) {
         // result
         case '3':
             result = optarg;
+            break;
+
+        case '4':
+            type = optarg;
+            break;
+        
+        case 'f':
+            flag_file = 1;
+            break;
+        
+        case 'r':
+            flag_raw = 1;
             break;
 
         // 옵션 못 알아먹었을 때
@@ -94,29 +116,59 @@ int main(int argc, char* argv[]) {
     // printf("target: %s\n", target);
     // printf("result: %s\n", result);
 
-    if(flag_keygen) {
-        // puts("flag_keygen activated!");
-        kyber_keygen(result);
+    if(flag_raw) {
+        if(flag_keygen) {
+            // puts("flag_keygen activated!");
+            kyber_keygen_raw();
+        }
+        else if (flag_encap) {
+            // puts("flag_encap activated!");
+            kyber_encapsulate_raw(key);
+        }
+        else if(flag_decap) {
+            // puts("flag_decap activated!");
+            kyber_decapsulate_raw(key, target);
+        }
+        else if(flag_encrypt) {
+            // puts("flag_encrypt activated!");
+            kyber_encrypt_raw(key, target);
+        }
+        else if(flag_decrypt) {
+            // puts("flag_decrypt activated!");
+            kyber_decrypt_raw(key, target);
+        }
+        else {
+            fprintf(stderr, "err: no options activated\n");
+        }
     }
-    else if (flag_encap) {
-        // puts("flag_encap activated!");
-        kyber_encapsulate(key, result);
+    else if(flag_file) {
+
+        if(flag_keygen) {
+            // puts("flag_keygen activated!");
+            kyber_keygen(result);
+        }
+        else if (flag_encap) {
+            // puts("flag_encap activated!");
+            kyber_encapsulate(key, result);
+        }
+        else if(flag_decap) {
+            // puts("flag_decap activated!");
+            kyber_decapsulate(key, target, result);
+        }
+        else if(flag_encrypt) {
+            // puts("flag_encrypt activated!");
+            kyber_encrypt(key, target, result);
+        }
+        else if(flag_decrypt) {
+            // puts("flag_decrypt activated!");
+            kyber_decrypt(key, target, result);
+        }
+        else {
+            fprintf(stderr, "err: no options activated\n");
+        }
+
     }
-    else if(flag_decap) {
-        // puts("flag_decap activated!");
-        kyber_decapsulate(key, target, result);
-    }
-    else if(flag_encrypt) {
-        // puts("flag_encrypt activated!");
-        kyber_encrypt(key, target, result);
-    }
-    else if(flag_decrypt) {
-        // puts("flag_decrypt activated!");
-        kyber_decrypt(key, target, result);
-    }
-    else {
-        fprintf(stderr, "err: no options activated\n");
-    }
+    
 
 err:
     // puts("into err label");
