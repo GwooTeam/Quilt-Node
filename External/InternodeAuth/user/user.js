@@ -2,6 +2,7 @@
 const net = require('net');
 const fs = require('fs');
 const { exec } = require('child_process');
+const process = require('process');
 
 
 
@@ -20,8 +21,9 @@ const textServer = net.createServer(socket => {
     console.log('Client connected');
     socket.on('data', data => {
         const message = data.toString().trim();
-        if (message === 'auth request') {
+        if (message === 'auth request') { 
             console.log('Authentication request received');
+            console.time("authModuleExecutionTime");
            // Generate a random value
            const randomValue = Math.random().toString(36).substr(2, 9);
            console.log(`Generated Random Value: ${randomValue}`);
@@ -98,5 +100,8 @@ function nonce_verify() {
           return;
       }
       console.log(`nonce_verify Output: ${stdout}`);
+      console.timeEnd("authModuleExecutionTime");
+      
+      process.exit(0);
   });
 }
