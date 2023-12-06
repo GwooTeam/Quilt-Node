@@ -76,14 +76,19 @@ const fileServer = net.createServer(socket => {
     kem_decapsulate(prk_path, capsule_path, result_path);
 
     ssk_encrypt(ssk_path, data_path, result_path);
+    
+    // const encryptFilePath = 'userResource/kyber_encrypted.bin';
+    const content = fs.readFileSync(encryptFilePath); 
+    socket.write(content);
+    socket.end();
 
 
   }); // socket.on('data')
 
   socket.on('end', () => {
-    const encryptFilePath = 'userResource/kyber_encrypted.bin';
-    const content = fs.readFileSync(encryptFilePath);
-    socket.write(content);
+   // const encryptFilePath = 'userResource/kyber_encrypted.bin';
+   // const content = fs.readFileSync(encryptFilePath);
+    // socket.write(content);
     console.log('data transfer end: ' + (new Date()).getTime());
     console.log('File transfer completed');
     socket.end();

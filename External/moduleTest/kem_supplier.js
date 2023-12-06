@@ -95,7 +95,7 @@ function sendFile(filePath, callback) {
         const fileContent = fs.readFileSync(filePath);
 
         fileClient.write(fileContent);
-        fileClient.end();
+        // fileClient.end();
     });
 }
 
@@ -107,12 +107,14 @@ fileClient.on('data', (data) => {
 
 
 fileClient.on('end', () => {
+    
     // 서버에서 받은 작업 완료된 파일을 클라이언트에 저장
     const filename = 'suppResource/received_encrypted.bin';
     fs.writeFileSync(filename, receivedData);
     console.log('File transfer completed');
 
     // 소켓 연결 종료
+    fileClient.end();
     fileClient.destroy();
 
     const ssk_path = 'suppResource/kyber_sharedSecret.ssk';
