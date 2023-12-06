@@ -174,7 +174,10 @@ received.txt
 *.prk
 *.puk
 *.bin
-dmodule
 
 # internode auth
 config.json
+
+# kmodule
+*.ssk
+*.cap
