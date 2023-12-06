@@ -178,4 +178,5 @@ received.txt
 quilt-sandbox-gateway
 sandbox_gateway
 
-/External/NodeManager/NodeAuth/config.json
+/src/manage/nodeAuth/config.json
+/src/manage/nodeAuth/temp.ts
