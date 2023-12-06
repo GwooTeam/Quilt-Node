@@ -1,4 +1,4 @@
-const { ipcRenderer } = require('electron');
+//const { ipcRenderer } = require('electron');
 
 window.onload = function(){
     //renderer가 함수이름을 요청함 : request-functions

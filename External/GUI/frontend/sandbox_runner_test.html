@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>
+        Sandbox Runner가 Electron에서 돌아가는지 확인하는 프로그램
+    </title>
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
+    <meta
+      http-equiv="X-Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
+  </head>
+  <body>
+    <h1>Hello Sandbox Runner!</h1>
+    <!--#button_sandboxRunner_trigger : 해당 버튼을 누르면 SandboxRunner_trigger 이벤트를 메인프로세스에게 일으킴-->
+    <h3>아래 버튼을 누르면 sandboxRunner 트리거가 실행</h3>
+    <button id="button_sandboxRunner">SandboxRunner_trigger</button>
+    <script src="../dist/frontend/sandbox_runner_test.js"></script>
+    <!--로그를 위한 텍스트창-->
+    <div id="log_sandboxRunner" style="width: 100%; height: 300px; overflow-y: auto; border: 1px solid black;">
+    <!-- Log messages will be appended here -->
+    </div>
+  </body>
+</html>

@@ -6,6 +6,7 @@ import { Driver } from "tgrid/components/Driver";
 import { CommandReply, IDocker } from "../communication/controllers/IDocker";
 import {Spinner} from "cli-spinner";
 import { IMAGE_NAME, SERVER_IP, PORT_TGRID }from "../communication/global/Dockerode-config"
+import { SandboxRunner } from "./sandbox_runner_event";
 
 const mainWindowOption:Electron.BrowserWindowConstructorOptions ={
     height : 600,
@@ -17,14 +18,14 @@ const mainWindowOption:Electron.BrowserWindowConstructorOptions ={
     width: 800,
 };
 
-function createWindow():BrowserWindow{
+function createWindow(index_html_name:String):BrowserWindow{
     const mainWindow = new BrowserWindow(mainWindowOption);
 
     //#####
     mainWindow.webContents.openDevTools();
 
     //load the index.html of the app
-    mainWindow.loadFile(path.join(__dirname, "../../frontend/tempIndex.html"));
+    mainWindow.loadFile(path.join(__dirname, "..", "..", "frontend", `${index_html_name}.html`));
     return mainWindow;
 }
 
@@ -72,29 +73,30 @@ function setSendingStdoutToHTML(mainWindow:BrowserWindow){
     };
 }
 
-async function main(){
-    /*
+async function connectWebsocketOfTgrid(){
     let loading = new Spinner("TGRID 초기 설정 중");
     loading.start();
     let dockerProvider = new DockerProvider();
     let connector: WebConnector<null, DockerProvider> = new WebConnector(null, dockerProvider);
     await connector.connect(`ws://${SERVER_IP}:${PORT_TGRID}`);
     loading.stop(true);
-
-    let dock: Driver<IDocker> = connector.getDriver<IDocker>();
-    let image:string = IMAGE_NAME;
+    
     console.log("TGRID is opend. now creat new Window soon.")
-    assignEvents(dock);
-    */
+    return connector.getDriver<IDocker>();;
+}
+
+
+async function main(){
+    //let tgrid_driver_dock:Driver<IDocker> = await connectWebsocketOfTgrid();
+    //assignEvents(tgrid_driver_dock);
     await app.whenReady();
-    let mainWindow = createWindow();
-
-    //setSendingStdoutToHTML(mainWindow);
-
+    let mainWindow = createWindow("sandbox_runner_test");
     app.on("window-all-closed", () => {
         if(process.platform !== "darwin") {
             app.quit();
         }
     });
+
+    const sandbox_runner = new SandboxRunner(true);
 }
 main();
