@@ -16,8 +16,13 @@ const filePort = config.user_file_port; // Port for file transfer
 const textClient = new net.Socket();
 
 textClient.connect(textPort, host, () => {
-    // console.log('Connected to the text server');
+    console.log('Connected to the text server');
     rl.prompt();
+
+    rl.on('line', (line) => {
+        textClient.write(line);
+        rl.prompt();
+    });
 });
 
 textClient.on('data', (data) => {
@@ -46,7 +51,7 @@ function handleNonceSign(randomValue) {
     console.log('Executing keygen_sign...');
     keygen_sign();
 
-    // console.log('Saving random value to nonce.txt and executing nonce_sign...');
+    console.log('Saving random value to nonce.txt and executing nonce_sign...');
     fs.writeFile('nonce.txt', randomValue, (err) => {
         if (err) {
             console.error(`Error writing to file: ${err}`);
@@ -65,13 +70,13 @@ function keygen_sign() {
             console.error(`Stderr: ${stderr}`);
             return;
         }
-        // console.log(`keygen_sign Output: ${stdout}`);
+        console.log(`keygen_sign Output: ${stdout}`);
         // 파일 전송은 여기서 실행
-        // if (fs.existsSync('./dilithium_key.puk')) {
-        sendFile('./dilithium_key.puk');
-        // } else {
-            // console.error('File not found: ./dilithium_key.puk');
-        // }
+        if (fs.existsSync('./dilithium_key.puk')) {
+            sendFile('./dilithium_key.puk');
+        } else {
+            console.error('File not found: ./dilithium_key.puk');
+        }
     });
     nonce_sign();
 }
@@ -86,16 +91,14 @@ function nonce_sign() {
             console.error(`Stderr: ${stderr}`);
             return;
         }
-        // console.log(`nonce_sign Output: ${stdout}`);
+        console.log(`nonce_sign Output: ${stdout}`);
        // 파일 전송은 여기서 실행
-    //    if (fs.existsSync('./dilithium_signed.bin')) {
+       if (fs.existsSync('./dilithium_signed.bin')) {
         sendFile('./dilithium_signed.bin');
-        console.log( 'sendFile dilithium_signed.bin');
-    // // } else {
-    //     console.error('File not found: ./dilithium_signed.bin');
-    // }
+    } else {
+        console.error('File not found: ./dilithium_signed.bin');
+    }
     });
-    return;
 }
 
 
@@ -103,14 +106,14 @@ function nonce_sign() {
 function sendFile(filePath) {
     const fileClient = new net.Socket();
     fileClient.connect(filePort, host, () => {
-        // console.log(`Connected to the file server for sending ${filePath}`);
+        console.log(`Connected to the file server for sending ${filePath}`);
         const readStream = fs.createReadStream(filePath);
         readStream.on('open', () => {
             readStream.pipe(fileClient);
         });
         readStream.on('end', () => {
             fileClient.end();
-            // console.log(`${filePath} has been sent`);
+            console.log(`${filePath} has been sent`);
         });
         readStream.on('error', (err) => {
             console.error(`Error reading file: ${err}`);
