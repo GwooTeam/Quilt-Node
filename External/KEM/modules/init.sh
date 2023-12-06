@@ -2,4 +2,4 @@
 
 export LD_LIBRARY_PATH=`pwd`
 
-# sudo cp libNSCrypto.so /lib
+sudo cp libNSKem.so /lib/libNSCrypto.so
