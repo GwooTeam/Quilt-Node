@@ -175,6 +175,7 @@ received.txt
 *.puk
 *.bin
 
-/External/Sandbox/Runner/quilt-sandbox-gateway
-/External/Sandbox/Runner/sandbox_gateway
+quilt-sandbox-gateway
+sandbox_gateway
+
 /External/NodeManager/NodeAuth/config.json
