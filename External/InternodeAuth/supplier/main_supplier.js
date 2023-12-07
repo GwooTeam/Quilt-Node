@@ -6,7 +6,7 @@ let kem_time;
 
 function run(callback) {
     // verify code
-    const supplier_sign = spawn('node', ['supplier.js']);
+    const supplier_sign = spawn('node', ['dsa_supplier.js']);
 
     supplier_sign.stdout.on('data', (data) => {
         const msg = data.toString().trim();
@@ -34,7 +34,7 @@ function run(callback) {
             
             supplier_kem.on('exit', (kemCode) => {
                 if (kemCode === 0) {
-                    console.log('main_supplier complete.');
+                    // console.log('main_supplier complete.');
                     callback();
                 } else {
                     console.error('kem_supplier.js 실행 중 오류 발생');
@@ -50,9 +50,7 @@ function run(callback) {
 
 
 run( () => {
-    console.log('sign_time: ' + sign_time );
-    console.log('kem_time: ' + kem_time);
-    console.log('total time: ' + (sign_time + kem_time));
+    console.log(`sign time: ${sign_time}, kem_time: ${kem_time}, total time: ` + (sign_time + kem_time));
 } );
 
 

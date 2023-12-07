@@ -12,16 +12,18 @@ const { execSync } = require('child_process');
 
 const config = require('./supplier_config.json');
 const host = config.user_ip;
+const userPort = config.user_port;
 const textPort = config.sign_text_port; // Port for text communication
 const filePort = config.sign_file_port; // Port for file transfer
 
-const textClient = new net.Socket();
+
 
 let puk_val;
 let prk_val;
 let sign_val;
 
-textClient.connect(textPort, host, () => {
+const textClient = new net.Socket();
+textClient.connect(userPort, host, () => {
     // console.log('Connected to the text server'); - test code
     // rl.prompt();
 
@@ -31,12 +33,11 @@ textClient.connect(textPort, host, () => {
     // });
     console.time('sign_time');
     textClient.write('auth request');
-
 });
 
 textClient.on('data', (data) => {
     const message = data.toString().trim();
-    // console.log(`Server: ${message}`); - test code
+    console.log(`Server: ${message}`);
 
     // Check if the message is a random value
     if (message.startsWith('Random Value: ')) {
@@ -52,7 +53,7 @@ textClient.on('data', (data) => {
 });
 
 textClient.on('close', () => {
-    // console.log('Connection to the text server closed'); -- test code
+    console.log('Connection to the text server closed');
     // rl.close();
 });
 
@@ -67,12 +68,12 @@ function handleNonceSign(randomValue) {
     });
 
     // console.log('Saving random value to nonce.txt and executing nonce_sign...'); -- test code
-    fs.writeFile('nonce.txt', randomValue, (err) => {
-        if (err) {
-            console.error(`Error writing to file: ${err}`);
-            return;
-        }
-    });
+    // fs.writeFile('nonce.txt', randomValue, (err) => {
+    //     if (err) {
+    //         console.error(`Error writing to file: ${err}`);
+    //         return;
+    //     }
+    // });
 }
 
 function keygen_sign(callback) {
@@ -91,7 +92,8 @@ function keygen_sign(callback) {
     prk_val = ((keygen_out.toString()).match(/prk=([^&]+)/))[1];
     // console.log('puk_val: ' + puk_val);
     // console.log('prk_val: ' + prk_val);
-    sendData('puk=' + puk_val);
+    // sendData('puk=' + puk_val);
+    textClient.write('puk=' + puk_val);
     callback();
     // nonce_sign();
 }
@@ -110,7 +112,9 @@ function nonce_sign_raw(dataVal, prkVal) {
     });
     sign_val = ((sign_out.toString()).match(/sign=([^&]+)/))[1];
     // console.log('sign_val: ' + sign_val);
-    sendData('sign=' + sign_val);
+    textClient.write('sign=' + sign_val);
+    textClient.end();
+    // sendData('sign=' + sign_val);
 }
 
 function nonce_sign() {
@@ -135,12 +139,14 @@ function nonce_sign() {
 
 
 function sendData(data) {
-    const fileClient = new net.Socket();
-    fileClient.connect(filePort, host, () => {
-        // console.log(`Connected to the file server for sending ${filePath}`); -- test code
-        fileClient.write(data);
-        fileClient.end();
-    });
+    textClient.write(data);
+    // textClient.end();
+    // const Client = new net.Socket();
+    // Client.connect(userPort, host, () => {
+    //     // console.log(`Connected to the file server for sending ${filePath}`); -- test code
+    //     Client.write(data);
+    //     Client.end();
+    // });
     
 }
 

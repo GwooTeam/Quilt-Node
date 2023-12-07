@@ -4,6 +4,7 @@
     "sign_file_port": "31246",
     "kem_text_port": "31247",
     "kem_file_port": "31248",
+    "user_port": "31245",
 
     "supplier_ip": "localhost",
     
