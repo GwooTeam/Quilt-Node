@@ -28,13 +28,13 @@ let socket_pool = [];
 
 const textServer = net.createServer(socket => {
 
-    // let nonce_val;
-    // let puk_val;
-    // let sign_val;
-    // socket_pool.push({  'num':++nodeNum,
-    //                     'nonce': nonce_val,
-    //                     'puk': puk_val,
-    //                     'sign': sign_val});
+    let nonce_val;
+    let puk_val;
+    let sign_val;
+    socket_pool.push({  'num':++nodeNum,
+                        'nonce': nonce_val,
+                        'puk': puk_val,
+                        'sign': sign_val});
 
     console.log('Client connected');
     textServer_socket = socket;
