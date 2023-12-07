@@ -1,4 +1,4 @@
-##Git Convention
+## Git Convention
 ### Issue
 * 이슈 템플릿을 사용하여 작성한다.
 * 작업 완료된 이슈는 작업 완료(머지) 후 닫는다.
