@@ -10,7 +10,7 @@
 │   ├── **dmodule**  
 │   └── **kmodule**  
 ├── docs _`←문서관련`_  
-├── resource _`←GUI(html, css 등 단, js는 electron/renderer에 있어야함)`_
+├── resource _`←GUI(html, css 등 단, js는 electron/renderer에 있어야함)`_  
 ├── src _`←소스코드`_  
 │   ├── communication _`←노드간 데이터통신관련 모듈들`_  
 │   │   ├── **dataDeliver**  
