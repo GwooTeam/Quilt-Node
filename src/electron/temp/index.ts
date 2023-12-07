@@ -1,11 +1,11 @@
 import { app, BrowserView, BrowserWindow, ipcMain } from "electron";
 import * as path from "path";
-import { DockerProvider } from "../communication/providers/Docker"
+import { DockerProvider } from "../../communication/tgrid/providers/Docker"
 import { WebConnector } from "tgrid/protocols/web/WebConnector";
 import { Driver } from "tgrid/components/Driver";
-import { CommandReply, IDocker } from "../communication/controllers/IDocker";
+import { CommandReply, IDocker } from "../../communication/tgrid/controllers/IDocker";
 import {Spinner} from "cli-spinner";
-import { IMAGE_NAME, SERVER_IP, PORT_TGRID }from "../communication/global/Dockerode-config"
+import { IMAGE_NAME, SERVER_IP, PORT_TGRID } from "../../communication/tgrid/global/Dockerode-config"
 import { SandboxRunner } from "./sandbox_runner_event";
 
 const mainWindowOption:Electron.BrowserWindowConstructorOptions ={
@@ -25,7 +25,8 @@ function createWindow(index_html_name:String):BrowserWindow{
     mainWindow.webContents.openDevTools();
 
     //load the index.html of the app
-    mainWindow.loadFile(path.join(__dirname, "..", "..", "frontend", `${index_html_name}.html`));
+    console.log(path.join(__dirname, "..", "..", "..", "resource", `${index_html_name}.html`));
+    mainWindow.loadFile(path.join(__dirname, "..", "..", "..","resource", `${index_html_name}.html`));
     return mainWindow;
 }
 
@@ -52,7 +53,7 @@ function assignEvents(dock: Driver<IDocker>){
 function fetchProvidersFromDockerode(): string[]{
     const dockerProvider = new DockerProvider();
     let name_functions:string[] = [];
-    name_functions = Object.getOwnPropertyNames(DockerProvider.prototype);
+    name_functions = Object.getOwnPropertyNames(dockerProvider.prototype);
     //가져온 프로퍼티에서 `constructor`은 제거
     for(var i=0; i<name_functions.length; i++){
         if(name_functions[i] === "constructor"){
@@ -84,7 +85,6 @@ async function connectWebsocketOfTgrid(){
     console.log("TGRID is opend. now creat new Window soon.")
     return connector.getDriver<IDocker>();;
 }
-
 
 async function main(){
     //let tgrid_driver_dock:Driver<IDocker> = await connectWebsocketOfTgrid();

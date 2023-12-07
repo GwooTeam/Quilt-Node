@@ -6,24 +6,25 @@
 
 ## 폴더구조
 .  
-├── crypto _←암호모듈 관련_  
+├── crypto _`←암호모듈 관련`_  
 │   ├── **dmodule**  
 │   └── **kmodule**  
-├── docs _←문서관련_  
-├── src _←소스코드_  
-│   ├── communication _←노드간 데이터통신관련 모듈들_  
+├── docs _`←문서관련`_  
+├── resource _`←GUI(html, css 등 단, js는 electron/renderer에 있어야함)`_
+├── src _`←소스코드`_  
+│   ├── communication _`←노드간 데이터통신관련 모듈들`_  
 │   │   ├── **dataDeliver**  
 │   │   └── tgrid  
-│   ├── electron _←GUI 및 메인플로우담당_  
-│   │   ├── renderer _←GUI(html, css, js)_  
-│   ├── manage _←노드 관리 및 인증관련 모듈들_  
+│   ├── electron _`←GUI 및 메인플로우담당`_  
+│   │   ├── renderer _`←GUI(js) 및 GUI 렌더러`_  
+│   ├── manage _`←노드 관리 및 인증관련 모듈들`_  
 │   │   ├── **interNodeAuth**  
 │   │   ├── **nodeAuth**  
 │   │   └── **resouceLogging**  
-│   └── sandbox _←샌드박스 관련 모듈들_  
+│   └── sandbox _`←샌드박스 관련 모듈들`_  
 │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── **Runner**  
 │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── **monitor**  
-└── template _←그리드컴퓨팅 지원 템플릿_  
+└── template _`←그리드컴퓨팅 지원 템플릿`_  
 
 ## 모듈
 |이름|설명|Readme|To_electron|

@@ -1,14 +1,13 @@
 {
   "name": "gui_quiltnode",
   "version": "1.0.0",
-  "description": "This is GUI of Quilt-Node",
+  "description": "Quilt_nodejs",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "webpackbuild": "webpack",
     "lint": "eslint -c .eslintrc --ext .ts ./src",
-    "start": "npm run build && npm run webpackbuild && electron ./dist/backend/main.js"
+    "start": "npm run build && electron ./dist/electron/temp/"
   },
   "author": "LiiNi-coder",
   "license": "ISC",
