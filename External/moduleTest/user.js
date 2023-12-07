@@ -69,7 +69,7 @@ const fileServer = net.createServer(socket => {
 }); // const fileServer
 
 
-fileServer.listen(file_port, 'localhost', () => {
+fileServer.listen(file_port, host, () => {
   console.log(`File server listening at ${host}:${file_port}`);
 });
 

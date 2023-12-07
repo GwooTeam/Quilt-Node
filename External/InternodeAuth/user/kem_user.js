@@ -5,8 +5,9 @@ const { execSync } = require('child_process');
 
 
 /*  server config  */
-const text_port = 31245;
-const file_port = 31246;
+const config = require('./user_config.json');
+const text_port = config.kem_text_port;
+const file_port = config.kem_file_port;
 const host = 'localhost';
 
 // const socket = new net.Socket();
@@ -69,7 +70,7 @@ const fileServer = net.createServer(socket => {
 }); // const fileServer
 
 
-fileServer.listen(file_port, 'localhost', () => {
+fileServer.listen(file_port, host, () => {
   console.log(`File server listening at ${host}:${file_port}`);
 });
 

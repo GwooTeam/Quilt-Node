@@ -1,6 +1,11 @@
 {
-    "server_ip": "localhost",
-    "server_text_port": "31245",
-    "server_file_port": "31246",
+    "user_ip": "localhost",
+    "sign_text_port": "31245",
+    "sign_file_port": "31246",
+    "kem_text_port": "31247",
+    "kem_file_port": "31248",
+
+    "supplier_ip": "localhost",
+    
     "_comment_" : "edit this file name to config.json"
 }

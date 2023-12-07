@@ -9,8 +9,8 @@ const rl = readline.createInterface({
 });
 
 const config = require('./supplier_config.json');
-const filePort = config.server_file_port; // Port for file transfer
-const host = config.server_ip;
+const filePort = config.kem_file_port; // Port for file transfer
+const host = config.user_ip;
 const fileClient = new net.Socket();
 
 
@@ -96,8 +96,10 @@ fileClient.on('end', () => {
 
     ssk_decrypt(ssk_val, receivedData);
 
-    let endTime = new Date().getTime();
-    console.log('total time: ' + (endTime - startTime) + 'ms');
+    // let endTime = new Date().getTime();
+    // console.log('total time: ' + (endTime - startTime) + 'ms');
+    console.timeEnd('kem_time');
+    process.exit(0);
     
 })
 
@@ -130,7 +132,7 @@ let startTime;
 const puk_val = readBytesFromFile(puk_path);
 
 async function runFunctions() {
-    startTime = new Date().getTime();
+    console.time('kem_time');
     // console.log(puk_val);
     await kem_encapsulate(puk_val);
     // console.log(cap_val);

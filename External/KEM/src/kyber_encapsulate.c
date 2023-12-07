@@ -82,29 +82,29 @@ void kyber_encapsulate(const char* puk_path, const char* result_path) {
         goto err;
     }
 
-    NT_ULONG_PTR attr_type = (NT_ULONG_PTR)calloc(sizeof(NT_ULONG), 1);
-    NT_ULONG_PTR attr_ValLen = (NT_ULONG_PTR)calloc(sizeof(NT_ULONG), 1);
-    NT_BBOOL* attr_bSensitive = (NT_BBOOL*)calloc(sizeof(NT_BBOOL), 1);
-    NT_BBOOL* attr_bAlloc = (NT_BBOOL*)calloc(sizeof(NT_BBOOL), 1);
+    // NT_ULONG_PTR attr_type = (NT_ULONG_PTR)calloc(sizeof(NT_ULONG), 1);
+    // NT_ULONG_PTR attr_ValLen = (NT_ULONG_PTR)calloc(sizeof(NT_ULONG), 1);
+    // NT_BBOOL* attr_bSensitive = (NT_BBOOL*)calloc(sizeof(NT_BBOOL), 1);
+    // NT_BBOOL* attr_bAlloc = (NT_BBOOL*)calloc(sizeof(NT_BBOOL), 1);
 
-    fread(attr_type, sizeof(NT_ULONG), 1, puk_file);
-    fread(attr_ValLen, sizeof(NT_ULONG), 1, puk_file);
+    // fread(attr_type, sizeof(NT_ULONG), 1, puk_file);
+    // fread(attr_ValLen, sizeof(NT_ULONG), 1, puk_file);
 
-    NT_VOID_PTR attr_pValue = (NT_VOID_PTR)calloc(*attr_ValLen, 1);
+    NT_VOID_PTR attr_pValue = (NT_VOID_PTR)calloc(1184, 1); // kyber puk length: 1184
 
-    fread(attr_pValue, *attr_ValLen, 1, puk_file);
-    fread(attr_bSensitive, sizeof(NT_BBOOL), 1, puk_file);
-    fread(attr_bAlloc, sizeof(NT_BBOOL), 1, puk_file);
+    fread(attr_pValue, 1184, 1, puk_file);
+    // fread(attr_bSensitive, sizeof(NT_BBOOL), 1, puk_file);
+    // fread(attr_bAlloc, sizeof(NT_BBOOL), 1, puk_file);
     fclose(puk_file);
 
-    oPublicKey[1].type = *attr_type;
+    oPublicKey[1].type = NAT_VALUE;
 
-    oPublicKey[1].pValue = (NT_VOID_PTR)calloc(*attr_ValLen, 1);
-    memcpy(oPublicKey[1].pValue, attr_pValue, *attr_ValLen);
+    oPublicKey[1].pValue = (NT_VOID_PTR)calloc(1184, 1);
+    memcpy(oPublicKey[1].pValue, attr_pValue, 1184);
     
-    oPublicKey[1].ulValueLen = *attr_ValLen;
-    oPublicKey[1].bSensitive = *attr_bSensitive;
-    oPublicKey[1].bAlloc = *attr_bAlloc;
+    oPublicKey[1].ulValueLen = 1184;
+    oPublicKey[1].bSensitive = FALSE;
+    oPublicKey[1].bAlloc = TRUE;
 
     // check public key
     // NS_hex_dump(oPublicKey[1].pValue, oPublicKey[1].ulValueLen, (NT_BYTE_PTR) "public key");
@@ -149,11 +149,11 @@ void kyber_encapsulate(const char* puk_path, const char* result_path) {
         goto err;
     }
 
-    fwrite(&oEncryptedData[1].type, sizeof(NT_ULONG), 1, capsule_file);
-    fwrite(&oEncryptedData[1].ulValueLen, sizeof(NT_ULONG), 1, capsule_file);
+    // fwrite(&oEncryptedData[1].type, sizeof(NT_ULONG), 1, capsule_file);
+    // fwrite(&oEncryptedData[1].ulValueLen, sizeof(NT_ULONG), 1, capsule_file);
     fwrite(oEncryptedData[1].pValue, oEncryptedData[1].ulValueLen, 1, capsule_file);
-    fwrite(&oEncryptedData[1].bSensitive, sizeof(NT_BBOOL), 1, capsule_file);
-    fwrite(&oEncryptedData[1].bAlloc, sizeof(NT_BBOOL), 1, capsule_file);
+    // fwrite(&oEncryptedData[1].bSensitive, sizeof(NT_BBOOL), 1, capsule_file);
+    // fwrite(&oEncryptedData[1].bAlloc, sizeof(NT_BBOOL), 1, capsule_file);
     fclose(capsule_file);
     puts("complete to generate data capsule file.");
 
@@ -170,11 +170,11 @@ void kyber_encapsulate(const char* puk_path, const char* result_path) {
         goto err;
     }
 
-    fwrite(&oSharedSecret[1].type, sizeof(NT_ULONG), 1, ssk_file);
-    fwrite(&oSharedSecret[1].ulValueLen, sizeof(NT_ULONG), 1, ssk_file);
+    // fwrite(&oSharedSecret[1].type, sizeof(NT_ULONG), 1, ssk_file);
+    // fwrite(&oSharedSecret[1].ulValueLen, sizeof(NT_ULONG), 1, ssk_file);
     fwrite(oSharedSecret[1].pValue, oSharedSecret[1].ulValueLen, 1, ssk_file);
-    fwrite(&oSharedSecret[1].bSensitive, sizeof(NT_BBOOL), 1, ssk_file);
-    fwrite(&oSharedSecret[1].bAlloc, sizeof(NT_BBOOL), 1, ssk_file);
+    // fwrite(&oSharedSecret[1].bSensitive, sizeof(NT_BBOOL), 1, ssk_file);
+    // fwrite(&oSharedSecret[1].bAlloc, sizeof(NT_BBOOL), 1, ssk_file);
     fclose(ssk_file);
     puts("complete to generate ssk file.");
 
@@ -202,10 +202,10 @@ err:
         free(ssk_file_path);
     }
     
-    free(attr_type);
-    free(attr_ValLen);
+    // free(attr_type);
+    // free(attr_ValLen);
     free(attr_pValue);
-    free(attr_bSensitive);
-    free(attr_bAlloc);
+    // free(attr_bSensitive);
+    // free(attr_bAlloc);
 
 }

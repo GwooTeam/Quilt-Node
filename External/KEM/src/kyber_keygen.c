@@ -101,11 +101,11 @@ void kyber_keygen(const char* key_path) {
     // NT_BBOOL
     // NT_BBOOL
 
-    fwrite(&oPrivateKey[1].type, sizeof(NT_ULONG), 1, pri_key_file);
-    fwrite(&oPrivateKey[1].ulValueLen, sizeof(NT_ULONG), 1, pri_key_file);
+    // fwrite(&oPrivateKey[1].type, sizeof(NT_ULONG), 1, pri_key_file);
+    // fwrite(&oPrivateKey[1].ulValueLen, sizeof(NT_ULONG), 1, pri_key_file);
     fwrite(oPrivateKey[1].pValue, oPrivateKey[1].ulValueLen, 1, pri_key_file);
-    fwrite(&oPrivateKey[1].bSensitive, sizeof(NT_BBOOL), 1, pri_key_file);
-    fwrite(&oPrivateKey[1].bAlloc, sizeof(NT_BBOOL), 1, pri_key_file);
+    // fwrite(&oPrivateKey[1].bSensitive, sizeof(NT_BBOOL), 1, pri_key_file);
+    // fwrite(&oPrivateKey[1].bAlloc, sizeof(NT_BBOOL), 1, pri_key_file);
     fclose(pri_key_file);
     puts("success to create private key!");
 
@@ -126,11 +126,11 @@ void kyber_keygen(const char* key_path) {
     // NT_BBOOL
     // NT_BBOOL
 
-    fwrite(&oPublicKey[1].type, sizeof(NT_ULONG), 1, pub_key_file);
-    fwrite(&oPublicKey[1].ulValueLen, sizeof(NT_ULONG), 1, pub_key_file);
+    // fwrite(&oPublicKey[1].type, sizeof(NT_ULONG), 1, pub_key_file);
+    // fwrite(&oPublicKey[1].ulValueLen, sizeof(NT_ULONG), 1, pub_key_file);
     fwrite(oPublicKey[1].pValue, oPublicKey[1].ulValueLen, 1, pub_key_file);
-    fwrite(&oPublicKey[1].bSensitive, sizeof(NT_ULONG), 1, pub_key_file);
-    fwrite(&oPublicKey[1].bAlloc, sizeof(NT_ULONG), 1, pub_key_file);
+    // fwrite(&oPublicKey[1].bSensitive, sizeof(NT_ULONG), 1, pub_key_file);
+    // fwrite(&oPublicKey[1].bAlloc, sizeof(NT_ULONG), 1, pub_key_file);
     fclose(pub_key_file);
     puts("success to create public key!");
 

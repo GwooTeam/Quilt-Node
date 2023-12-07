@@ -84,29 +84,29 @@ void kyber_decapsulate(const char* prk_path, const char* capsule_path, const cha
     }
     puts("success to open prk file.");
 
-    NT_ULONG_PTR attr_type = (NT_ULONG_PTR)calloc(sizeof(NT_ULONG), 1);
-    NT_ULONG_PTR attr_ValLen = (NT_ULONG_PTR)calloc(sizeof(NT_ULONG), 1);
-    NT_BBOOL* attr_bSensitive = (NT_BBOOL*)calloc(sizeof(NT_BBOOL), 1);
-    NT_BBOOL* attr_bAlloc = (NT_BBOOL*)calloc(sizeof(NT_BBOOL), 1);
+    // NT_ULONG_PTR attr_type = (NT_ULONG_PTR)calloc(sizeof(NT_ULONG), 1);
+    // NT_ULONG_PTR attr_ValLen = (NT_ULONG_PTR)calloc(sizeof(NT_ULONG), 1);
+    // NT_BBOOL* attr_bSensitive = (NT_BBOOL*)calloc(sizeof(NT_BBOOL), 1);
+    // NT_BBOOL* attr_bAlloc = (NT_BBOOL*)calloc(sizeof(NT_BBOOL), 1);
 
-    fread(attr_type, sizeof(NT_ULONG), 1, prk_file);
-    fread(attr_ValLen, sizeof(NT_ULONG), 1, prk_file);
+    // fread(attr_type, sizeof(NT_ULONG), 1, prk_file);
+    // fread(attr_ValLen, sizeof(NT_ULONG), 1, prk_file);
 
-    NT_VOID_PTR attr_pValue = (NT_VOID_PTR)calloc(*attr_ValLen, 1);
+    NT_VOID_PTR attr_pValue = (NT_VOID_PTR)calloc(2400, 1); // kyber prk length: 2400
 
-    fread(attr_pValue, *attr_ValLen, 1, prk_file);
-    fread(attr_bSensitive, sizeof(NT_BBOOL), 1, prk_file);
-    fread(attr_bAlloc, sizeof(NT_BBOOL), 1, prk_file);
+    fread(attr_pValue, 2400, 1, prk_file);
+    // fread(attr_bSensitive, sizeof(NT_BBOOL), 1, prk_file);
+    // fread(attr_bAlloc, sizeof(NT_BBOOL), 1, prk_file);
     fclose(prk_file);
 
-    oPrivateKey[1].type = *attr_type;
-    oPrivateKey[1].ulValueLen = *attr_ValLen;
+    oPrivateKey[1].type = NAT_VALUE;
+    oPrivateKey[1].ulValueLen = 2400;
 
-    oPrivateKey[1].pValue = (NT_VOID_PTR)calloc(*attr_ValLen, 1);
-    memcpy(oPrivateKey[1].pValue, attr_pValue, *attr_ValLen);
+    oPrivateKey[1].pValue = (NT_VOID_PTR)calloc(2400, 1);
+    memcpy(oPrivateKey[1].pValue, attr_pValue, 2400);
     
-    oPrivateKey[1].bSensitive = *attr_bSensitive;
-    oPrivateKey[1].bAlloc = *attr_bAlloc;
+    oPrivateKey[1].bSensitive = TRUE;
+    oPrivateKey[1].bAlloc = TRUE;
 
     // check private key
     // NS_hex_dump(oPrivateKey[1].pValue, oPrivateKey[1].ulValueLen, (NT_BYTE_PTR) "private key");
@@ -133,32 +133,32 @@ void kyber_decapsulate(const char* prk_path, const char* capsule_path, const cha
     }
 
     // puts("read data from capsulated file..");
-    memset(attr_type, 0, sizeof(NT_ULONG));
-    // memset(attr_pValue, 0, *attr_ValLen);
-    memset(attr_ValLen, 0, sizeof(NT_ULONG));
-    memset(attr_bSensitive, 0, sizeof(NT_BBOOL));
-    memset(attr_bAlloc, 0, sizeof(NT_BBOOL));
+    // memset(attr_type, 0, sizeof(NT_ULONG));
+    // // memset(attr_pValue, 0, *attr_ValLen);
+    // memset(attr_ValLen, 0, sizeof(NT_ULONG));
+    // memset(attr_bSensitive, 0, sizeof(NT_BBOOL));
+    // memset(attr_bAlloc, 0, sizeof(NT_BBOOL));
     free(attr_pValue);
 
-    fread(attr_type, sizeof(NT_ULONG), 1, cap_file);
-    fread(attr_ValLen, sizeof(NT_ULONG), 1, cap_file);
+    // fread(attr_type, sizeof(NT_ULONG), 1, cap_file);
+    // fread(attr_ValLen, sizeof(NT_ULONG), 1, cap_file);
 
-    attr_pValue = (NT_VOID_PTR)calloc(*attr_ValLen, 1);
-    fread(attr_pValue, *attr_ValLen, 1, cap_file);
+    attr_pValue = (NT_VOID_PTR)calloc(1088, 1);
+    fread(attr_pValue, 1088, 1, cap_file);
 
-    fread(attr_bSensitive, sizeof(NT_BBOOL), 1, cap_file);
-    fread(attr_bAlloc, sizeof(NT_BBOOL), 1, cap_file);
+    // fread(attr_bSensitive, sizeof(NT_BBOOL), 1, cap_file);
+    // fread(attr_bAlloc, sizeof(NT_BBOOL), 1, cap_file);
     fclose(cap_file);
     printf("success to read capsulated file.\n");
 
-    oEncryptedData[1].type = *attr_type;
-    oEncryptedData[1].ulValueLen = *attr_ValLen;
+    oEncryptedData[1].type = NAT_VALUE;
+    oEncryptedData[1].ulValueLen = 1088;
 
-    oEncryptedData[1].pValue = (NT_VOID_PTR)calloc(*attr_ValLen, 1);
-    memcpy(oEncryptedData[1].pValue, attr_pValue, *attr_ValLen);
+    oEncryptedData[1].pValue = (NT_VOID_PTR)calloc(1088, 1);
+    memcpy(oEncryptedData[1].pValue, attr_pValue, 1088);
 
-    oEncryptedData[1].bSensitive = *attr_bSensitive;
-    oEncryptedData[1].bAlloc = *attr_bAlloc;
+    oEncryptedData[1].bSensitive = FALSE;
+    oEncryptedData[1].bAlloc = TRUE;
 
 
     /**
@@ -195,11 +195,11 @@ void kyber_decapsulate(const char* prk_path, const char* capsule_path, const cha
         goto err;
     }
 
-    fwrite(&oSharedSecret[1].type, sizeof(NT_ULONG), 1, decap_file);
-    fwrite(&oSharedSecret[1].ulValueLen, sizeof(NT_ULONG), 1, decap_file);
+    // fwrite(&oSharedSecret[1].type, sizeof(NT_ULONG), 1, decap_file);
+    // fwrite(&oSharedSecret[1].ulValueLen, sizeof(NT_ULONG), 1, decap_file);
     fwrite(oSharedSecret[1].pValue, oSharedSecret[1].ulValueLen, 1, decap_file);
-    fwrite(&oSharedSecret[1].bSensitive, sizeof(NT_BBOOL), 1, decap_file);
-    fwrite(&oSharedSecret[1].bAlloc, sizeof(NT_BBOOL), 1, decap_file);
+    // fwrite(&oSharedSecret[1].bSensitive, sizeof(NT_BBOOL), 1, decap_file);
+    // fwrite(&oSharedSecret[1].bAlloc, sizeof(NT_BBOOL), 1, decap_file);
     fclose(decap_file);
     puts("generate decapsulated data file complete.");
 
@@ -211,10 +211,10 @@ err:
 
     if(alloc_flag) free(decap_file_path);
 
-    if(attr_type) free(attr_type);
-    if(attr_ValLen) free(attr_ValLen);
+    // if(attr_type) free(attr_type);
+    // if(attr_ValLen) free(attr_ValLen);
     if(attr_pValue) free(attr_pValue);
-    if(attr_bSensitive) free(attr_bSensitive);
-    if(attr_bAlloc) free(attr_bAlloc);
+    // if(attr_bSensitive) free(attr_bSensitive);
+    // if(attr_bAlloc) free(attr_bAlloc);
 
 }

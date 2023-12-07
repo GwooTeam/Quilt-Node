@@ -179,21 +179,42 @@ void dilithium_sign(const char *data_path, const char *prk_path)
 
 
     /*서명 대상 데이터 파일 읽어오기*/
-    FILE *data_file = fopen(data_path, "r"); // 파일을 읽기 모드로 열기
-    if (data_file == NULL) {
-        printf("failed to open data file.\n");
+    // FILE *data_file = fopen(data_path, "r"); // 파일을 읽기 모드로 열기
+    // if (data_file == NULL) {
+    //     printf("failed to open data file.\n");
+    // }
+    // if (fgets(DataBuf, sizeof(DataBuf), data_file) != NULL) {
+    //     // 줄 바꿈 문자 제거
+    //     size_t len = strlen(DataBuf);
+    //     if (len > 0 && DataBuf[len - 1] == '\n') {
+    //         DataBuf[len - 1] = '\0';
+    //     }
+    // } else {
+    //     printf("fail to read data from file.\n");
+    // }
+    // fclose(data_file);
+    // printf("### data.txt : \n %s\n",DataBuf);
+
+    /*서명 대상 데이터 파일 읽어오기*/
+    FILE* data_file = fopen(data_path, "rb");
+    if(data_file == NULL) {
+        puts("failed to open data file..");
+        goto err;
     }
-    if (fgets(DataBuf, sizeof(DataBuf), data_file) != NULL) {
-        // 줄 바꿈 문자 제거
-        size_t len = strlen(DataBuf);
-        if (len > 0 && DataBuf[len - 1] == '\n') {
-            DataBuf[len - 1] = '\0';
-        }
-    } else {
-        printf("fail to read data from file.\n");
-    }
-    fclose(data_file);
-    printf("### data.txt : \n %s\n",DataBuf);
+
+    NT_ULONG data_file_size;
+
+    fseek(data_file, 0, SEEK_END);
+    data_file_size = ftell(data_file);
+    fseek(data_file, 0, SEEK_SET);
+
+    // 데이터 읽어오기
+    NT_VOID_PTR plainData = (NT_VOID_PTR)calloc(data_file_size, 1);
+    fread(plainData, data_file_size, 1, data_file);
+
+    // oData에 할당
+    oData[1].pValue = plainData; // plainData는 clear_object()에서 할당 해제됨. 여기서 해제 x.
+    oData[1].ulValueLen = data_file_size;
 
 
     /**
@@ -309,24 +330,45 @@ int dilithium_verify(const char *data_file_path, const char *signed_path, const 
     NS_hex_dump(oPublicKey[1].pValue, oPublicKey[1].ulValueLen, (NT_BYTE_PTR) "public key");
    
 
-    /*서명 대상 데이터 파일 읽어오기*/
-    FILE *data_file = fopen(data_file_path, "r"); 
-    if (data_file == NULL) {
-        printf("failed to open data file.\n");
-        return 1;
-    }
-    if (fgets(DataBuf, sizeof(DataBuf), data_file) != NULL) {
-        // 줄 바꿈 문자 제거
-        size_t len = strlen(DataBuf);
-        if (len > 0 && DataBuf[len - 1] == '\n') {
-            DataBuf[len - 1] = '\0';
-        }
-    } else {
-        printf("fail to read data from file.\n");
-    }
-    fclose(data_file);
-    // printf("### data.txt : \n %s\n",DataBuf);
+    // /*서명 대상 데이터 파일 읽어오기*/
+    // FILE *data_file = fopen(data_file_path, "r"); 
+    // if (data_file == NULL) {
+    //     printf("failed to open data file.\n");
+    //     return 1;
+    // }
+    // if (fgets(DataBuf, sizeof(DataBuf), data_file) != NULL) {
+    //     // 줄 바꿈 문자 제거
+    //     size_t len = strlen(DataBuf);
+    //     if (len > 0 && DataBuf[len - 1] == '\n') {
+    //         DataBuf[len - 1] = '\0';
+    //     }
+    // } else {
+    //     printf("fail to read data from file.\n");
+    // }
+    // fclose(data_file);
+    // // printf("### data.txt : \n %s\n",DataBuf);
 
+    /*서명 대상 데이터 파일 읽어오기*/
+    FILE* data_file = fopen(data_file_path, "rb");
+    if(data_file == NULL) {
+        puts("failed to open data file..");
+        goto err;
+    }
+
+    NT_ULONG data_file_size;
+
+    fseek(data_file, 0, SEEK_END);
+    data_file_size = ftell(data_file);
+    fseek(data_file, 0, SEEK_SET);
+
+    // 데이터 읽어오기
+    NT_VOID_PTR plainData = (NT_VOID_PTR)calloc(data_file_size, 1);
+    fread(plainData, data_file_size, 1, data_file);
+
+    // oData에 할당
+    oData[1].pValue = plainData; // plainData는 clear_object()에서 할당 해제됨. 여기서 해제 x.
+    oData[1].ulValueLen = data_file_size;
+    
 
     /*서명된 파일 불러오기*/
     oSignData[1].ulValueLen = 4000;

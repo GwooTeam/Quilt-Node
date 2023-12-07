@@ -2,7 +2,7 @@ const { exec } = require('child_process');
 
 
 function nonce_sign() {
-    exec('./dmodule -s nonce.txt dilithium_key.prk', (error, stdout, stderr) => {
+    exec('../../DigitalSignature/dmodule -s -f nonce.txt dilithium_key.prk', (error, stdout, stderr) => {
         if (error) {
             console.error(`Execution error: ${error.message}`);
             return;

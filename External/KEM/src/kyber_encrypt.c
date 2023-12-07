@@ -75,10 +75,10 @@ void kyber_encrypt(const char* ssk_path, const char* plain_path, const char* cip
      * 암호화에 사용할 ssk(sharedSecret)를 파일로부터 추출.
      */
 
-    NT_ULONG_PTR attr_type = (NT_ULONG_PTR)calloc(sizeof(NT_ULONG), 1);
-    NT_ULONG_PTR attr_ValLen = (NT_ULONG_PTR)calloc(sizeof(NT_ULONG), 1);
-    NT_BBOOL* attr_bSensitive = (NT_BBOOL*)calloc(sizeof(NT_BBOOL), 1);
-    NT_BBOOL* attr_bAlloc = (NT_BBOOL*)calloc(sizeof(NT_BBOOL), 1);
+    // NT_ULONG_PTR attr_type = (NT_ULONG_PTR)calloc(sizeof(NT_ULONG), 1);
+    // NT_ULONG_PTR attr_ValLen = (NT_ULONG_PTR)calloc(sizeof(NT_ULONG), 1);
+    // NT_BBOOL* attr_bSensitive = (NT_BBOOL*)calloc(sizeof(NT_BBOOL), 1);
+    // NT_BBOOL* attr_bAlloc = (NT_BBOOL*)calloc(sizeof(NT_BBOOL), 1);
 
     FILE* ssk_file = fopen(ssk_path, "rb");
     if(ssk_file == NULL) {
@@ -87,23 +87,23 @@ void kyber_encrypt(const char* ssk_path, const char* plain_path, const char* cip
     }
 
     // 데이터 읽기
-    fread(attr_type, sizeof(NT_ULONG), 1, ssk_file);
-    fread(attr_ValLen, sizeof(NT_ULONG), 1, ssk_file);
-    NT_VOID_PTR attr_pValue = (NT_VOID_PTR)calloc(*attr_ValLen, 1);
+    // fread(attr_type, sizeof(NT_ULONG), 1, ssk_file);
+    // fread(attr_ValLen, sizeof(NT_ULONG), 1, ssk_file);
+    NT_VOID_PTR attr_pValue = (NT_VOID_PTR)calloc(32, 1); // kyber ssk (AES256) length: 32
 
-    fread(attr_pValue, *attr_ValLen, 1, ssk_file);
-    fread(attr_bSensitive, sizeof(NT_BBOOL), 1, ssk_file);
-    fread(attr_bAlloc, sizeof(NT_BBOOL), 1, ssk_file);
+    fread(attr_pValue, 32, 1, ssk_file);
+    // fread(attr_bSensitive, sizeof(NT_BBOOL), 1, ssk_file);
+    // fread(attr_bAlloc, sizeof(NT_BBOOL), 1, ssk_file);
 
     // 오브젝트에 데이터 복사
-    oKey[1].type = *attr_type;
-    oKey[1].ulValueLen = *attr_ValLen;
+    oKey[1].type = NAT_VALUE;
+    oKey[1].ulValueLen = 32;
 
-    oKey[1].pValue = (NT_VOID_PTR)calloc(*attr_ValLen, 1);
-    memcpy(oKey[1].pValue, attr_pValue, *attr_ValLen);
+    oKey[1].pValue = (NT_VOID_PTR)calloc(32, 1);
+    memcpy(oKey[1].pValue, attr_pValue, 32);
     
-    oKey[1].bSensitive = *attr_bSensitive;
-    oKey[1].bAlloc = *attr_bAlloc;
+    oKey[1].bSensitive = TRUE;
+    oKey[1].bAlloc = TRUE;
 
     // check ssk
     // NS_hex_dump(oKey[1].pValue, oKey[1].ulValueLen, (NT_BYTE_PTR) "shared Secret");
@@ -207,11 +207,11 @@ err:
     NS_clear_object(&oKey, 2);
     NS_clear_object(&oEncryptedData, 2);
 
-    free(attr_type);
-    free(attr_ValLen);
+    // free(attr_type);
+    // free(attr_ValLen);
     free(attr_pValue);
-    free(attr_bSensitive);
-    free(attr_bAlloc);
+    // free(attr_bSensitive);
+    // free(attr_bAlloc);
 
 }
 

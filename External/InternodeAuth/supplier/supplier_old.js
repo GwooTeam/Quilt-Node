@@ -3,6 +3,7 @@ const { exec } = require('child_process');
 const readline = require('readline');
 const fs = require('fs');
 const process = require('process');
+const { execSync } = require('child_process');
 
 // const rl = readline.createInterface({
 //     input: process.stdin,
@@ -15,6 +16,10 @@ const textPort = config.sign_text_port; // Port for text communication
 const filePort = config.sign_file_port; // Port for file transfer
 
 const textClient = new net.Socket();
+
+let puk_val;
+let prk_val;
+let sign_val;
 
 textClient.connect(textPort, host, () => {
     // console.log('Connected to the text server'); - test code
@@ -43,13 +48,11 @@ textClient.on('data', (data) => {
         console.timeEnd('sign_time');
         textClient.end();
     }
-    
-
     // rl.prompt();
 });
 
 textClient.on('close', () => {
-    console.log('Connection to the text server closed');
+    // console.log('Connection to the text server closed'); -- test code
     // rl.close();
 });
 
@@ -58,10 +61,12 @@ textClient.on('error', (err) => {
 });
 
 function handleNonceSign(randomValue) {
-    console.log('Executing keygen_sign...');
-    keygen_sign();
+    // console.log('Executing keygen_sign...'); -- test code
+    keygen_sign(() => {
+        nonce_sign_raw(randomValue, prk_val);
+    });
 
-    console.log('Saving random value to nonce.txt and executing nonce_sign...');
+    // console.log('Saving random value to nonce.txt and executing nonce_sign...'); -- test code
     fs.writeFile('nonce.txt', randomValue, (err) => {
         if (err) {
             console.error(`Error writing to file: ${err}`);
@@ -70,8 +75,8 @@ function handleNonceSign(randomValue) {
     });
 }
 
-function keygen_sign() {
-    exec('../../DigitalSignature/dmodule --keygen -f', (error, stdout, stderr) => {
+function keygen_sign(callback) {
+    let keygen_out = execSync('../../DigitalSignature/dmodule --keygen -r', (error, stdout, stderr) => {
         if (error) {
             console.error(`Execution error: ${error.message}`);
             return;
@@ -81,14 +86,31 @@ function keygen_sign() {
             return;
         }
         // console.log(`keygen_sign Output: ${stdout}`); -- test code
-        // 파일 전송은 여기서 실행
-       if (fs.existsSync('./dilithium_key.puk')) {
-        sendFile('./dilithium_key.puk');
-    } else {
-        console.error('File not found: ./dilithium_key.puk');
-    }
     });
-    nonce_sign();
+    puk_val = ((keygen_out.toString()).match(/puk=(.*?)prk=/))[1];
+    prk_val = ((keygen_out.toString()).match(/prk=([^&]+)/))[1];
+    // console.log('puk_val: ' + puk_val);
+    // console.log('prk_val: ' + prk_val);
+    sendData('puk=' + puk_val);
+    callback();
+    // nonce_sign();
+}
+
+function nonce_sign_raw(dataVal, prkVal) {
+    let sign_out = execSync(`../../DigitalSignature/dmodule -s -r ${dataVal} ${prkVal}`, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Execution error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`Stderr: ${stderr}`);
+            return;
+        }
+        // console.log(`keygen_sign Output: ${stdout}`); -- test code
+    });
+    sign_val = ((sign_out.toString()).match(/sign=([^&]+)/))[1];
+    // console.log('sign_val: ' + sign_val);
+    sendData('sign=' + sign_val);
 }
 
 function nonce_sign() {
@@ -133,7 +155,7 @@ function sendFile(filePath) {
         });
         readStream.on('end', () => {
             fileClient.end();
-            console.log(`${filePath} has been sent`);
+            // console.log(`${filePath} has been sent`);
         });
         readStream.on('error', (err) => {
             console.error(`Error reading file: ${err}`);
