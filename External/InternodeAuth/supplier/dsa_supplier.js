@@ -113,7 +113,7 @@ function nonce_sign_raw(dataVal, prkVal) {
     sign_val = ((sign_out.toString()).match(/sign=([^&]+)/))[1];
     // console.log('sign_val: ' + sign_val);
     textClient.write('sign=' + sign_val);
-    textClient.end();
+    // textClient.end();
     // sendData('sign=' + sign_val);
 }
 

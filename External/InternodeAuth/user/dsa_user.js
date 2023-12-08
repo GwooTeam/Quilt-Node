@@ -53,7 +53,13 @@ const textServer = net.createServer(socket => {
         else if (message.startsWith('sign=')) {
           clientData.sign_val = message.split('sign=')[1];
           console.log('received sign data: ' + clientData.sign_val);
-          clientData.sign_flag = 1;
+          verify_res = nonce_verify_raw(clientData.nonce_val, clientData.sign_val, clientData.puk_val);
+          console.log('verify_res: ' + verify_res);
+          if(verify_res == 0) {
+              socket.write('verify OK');
+              clientData.sign_flag = 0;
+              verify_res = 1;
+          }
         }
 
       })
@@ -63,18 +69,21 @@ const textServer = net.createServer(socket => {
         // fileReceivedCount++;
         const clientData = clients[clientId];
   
-        if (clientData.sign_flag === 1) { // 두 번째 파일 수신 후 verify 실행
-          verify_res = nonce_verify_raw(clientData.nonce_val, clientData.sign_val, clientData.puk_val);
-          console.log('verify_res: ' + verify_res);
-          if(verify_res == 0) {
-              socket.write('verify OK');
-              clientData.sign_flag = 0;
-              delete clients[clientId];
-          }
-          // fileReceivedCount = 0;
-          // process.exit(0);
-        }
+        // if (clientData.sign_flag === 1) { // 두 번째 파일 수신 후 verify 실행
+        //   verify_res = nonce_verify_raw(clientData.nonce_val, clientData.sign_val, clientData.puk_val);
+        //   console.log('verify_res: ' + verify_res);
+        //   if(verify_res == 0) {
+        //       socket.write('verify OK');
+        //       clientData.sign_flag = 0;
+        //       delete clients[clientId];
+        //       verify_res = 1;
+        //   }
+        //   // fileReceivedCount = 0;
+        //   // process.exit(0);
+        // }
+        
         console.log('Client disconnected');
+        delete clients[clientId];
   
     });
   
