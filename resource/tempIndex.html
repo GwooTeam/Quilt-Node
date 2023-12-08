@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World!</title>
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
+    <meta
+      http-equiv="X-Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
+  </head>
+  <body>
+    <h1>Hello World!</h1>
+    Node.js환경에서 돌리고있어. <span id="node-version"></span>
+    , Chromium버전:<span id="chrome-version"></span>
+    , and Electron버전:<span id="electron-version"></span>
+    
+    <!--메인프로세스에게 동적으로 버튼을 가져옴-->
+    <div id="buttons">
+      <script src="/dist/electron/renderer/tempIndex_buttons.js"></script>
+    </div>
+  </body>
+
+  <!--로그를 위한 텍스트창-->
+  <div id="log" style="width: 100%; height: 300px; overflow-y: auto; border: 1px solid black;">
+    <!-- Log messages will be appended here -->
+  </div>
+</html>

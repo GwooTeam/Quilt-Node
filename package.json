@@ -1,0 +1,33 @@
+{
+  "name": "gui_quiltnode",
+  "version": "1.0.0",
+  "description": "Quilt_nodejs",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "eslint -c .eslintrc --ext .ts ./src",
+    "start": "npm run build && electron ./dist/electron/temp/"
+  },
+  "author": "LiiNi-coder",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/cli-spinner": "^0.2.1",
+    "@types/dockerode": "^3.3.19",
+    "@types/node": "^20.8.3",
+    "electron": "^26.3.0",
+    "ts-loader": "^9.5.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@types/axios": "^0.14.0",
+    "axios": "^1.6.2",
+    "cli-spinner": "^0.2.10",
+    "cli-spinners": "^2.9.1",
+    "dockerode": "^3.3.5",
+    "tgrid": "^0.8.8"
+  }
+}

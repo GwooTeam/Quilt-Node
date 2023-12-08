@@ -1,8 +1,0 @@
-{
-    "SERVER_DOMAIN" : "http://gwoo.n-e.kr",
-    "SERVER_URL_PATH": {
-        "getServerPubKey" : "/node/requestSvrPubK",
-        "enrollNonce": "/node/{id}/generateNonce",
-        "verify": "/node/{id}/verify"
-    }
-}
