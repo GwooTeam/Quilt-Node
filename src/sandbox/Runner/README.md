@@ -1,4 +1,9 @@
 # 모듈 Readme
+
+## 샌드박스 형태
+- 샌드박스는 gVisor를 이용한 도커 컨테이너이다
+- 아직 윈도우 환경에서만 지원하며 WSL상의 quilt-sandbox-gateway라는 리눅스 배포판이 Running되고, 그 안에 docker로 컨테이너에 위치하게 된다
+
 ## 실행방법
 1. 드라이브 자료공유용 폴더에 quilt-sandbox-gateway를 찾아 다운(1.77GB)받고 해당 readme의 폴더에 복사한다.
 2. 해당 폴더에 main.py를 run하면 된다.

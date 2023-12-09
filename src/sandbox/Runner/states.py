@@ -50,7 +50,7 @@ class SettingState(State):
                 else:
                     #세팅 실패
                     print_status_and_error(self, SETTINGERROR_MSG)
-                    machine.state = InitialState()
+                    machine.state = ErrorState()
             elif timer_task in done:
                 setting_task.cancel()
                 print(TIMEOUT_MSG, file=sys.stderr)

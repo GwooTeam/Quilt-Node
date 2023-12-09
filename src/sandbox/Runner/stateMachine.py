@@ -84,11 +84,19 @@ class StateMachine:
         return True
     
     async def run(self):
+        is_normal_exit = True
         while True:
             print(f"[State] {self.state.__class__.__name__}")
             await self.state.run(self)
-            if isinstance(self.state, EndState) or isinstance(self.state, ErrorState):
+            if isinstance(self.state, EndState):
+                break
+            elif isinstance(self.state, ErrorState):
+                is_normal_exit = False
                 break
         print(f"[State] {self.state.__class__.__name__}")
         await self.state.run(self)    
         print(f"[LOG] Sandbox Runner is shutdowned.")
+        if is_normal_exit:
+            os._exit(0)
+        else:
+            os._exit(1)
