@@ -29,7 +29,7 @@ let ssk_val;
 
 /*  functions  */
 function kem_encapsulate(pukVal) {
-    let encap_out = execSync(`../../KEM/modules/kmodule --encap -r --key=${pukVal}`, (error, stdout, stderr) => {
+    let encap_out = execSync(`../../KEM/modules/kmodule --encap -r --key=123`, (error, stdout, stderr) => {
         if (error) {
             console.error(`Execution error: ${error.message}`);
             return;
@@ -42,6 +42,7 @@ function kem_encapsulate(pukVal) {
     });
     cap_val = ((encap_out.toString()).match(/encapsulated=([^&]+)/))[1];
     ssk_val = ((encap_out.toString()).match(/ssk=([^&]+)/))[1];
+    console.log('ssk val: ' + ssk_val);
 }
 
 

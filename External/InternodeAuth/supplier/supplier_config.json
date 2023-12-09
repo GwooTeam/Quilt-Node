@@ -5,6 +5,8 @@
     "kem_text_port": "31247",
     "kem_file_port": "31248",
     "user_port": "31245",
+    "dmodule_path":"../../DigitalSignature/dmodule",
+    "kmodule_path":"../../KEM/modules/kmodule",
 
     "supplier_ip": "localhost",
     

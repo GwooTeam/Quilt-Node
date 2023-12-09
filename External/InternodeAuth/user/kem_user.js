@@ -91,6 +91,7 @@ function kem_decapsulate(prkVal, capVal) {
       // console.log(`decapsulate Output: ${stdout.toString()}`);
   });
   ssk_val = ((decap_out.toString()).match(/ssk=([^&]+)/))[1];
+  console.log('ssk val: ' + ssk_val);
   // console.log(res.toString());
 
 }
