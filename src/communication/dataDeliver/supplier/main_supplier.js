@@ -51,12 +51,12 @@ function run(callback) {
                     // console.log('main_supplier complete.');
                     callback();
                 } else {
-                    console.error('kem_supplier.js 실행 중 오류 발생');
+                    console.error('error while executing kem_supplier.js');
                 }
             });
 
         } else {
-            console.error('supplier_dsa.js 실행 중 오류 발생');
+            console.error('error while supplier_dsa.js');
         }
     });
     

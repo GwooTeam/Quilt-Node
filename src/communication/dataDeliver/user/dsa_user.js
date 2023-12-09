@@ -1,7 +1,6 @@
 //tcp server
 
 const net = require('net');
-const { exec } = require('child_process');
 const { execSync } = require('child_process');
 
 
