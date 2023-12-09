@@ -12,7 +12,7 @@ function run() {
 
     // 자식 프로세스의 표준 에러 출력 처리
     user_sign.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`);
+        console.error(`user_sign stderr: ${data}`);
     });
 
     // 자식 프로세스 종료 시 처리

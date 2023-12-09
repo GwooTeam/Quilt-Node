@@ -8,6 +8,16 @@ function run(callback) {
     // verify code
     const supplier_sign = spawn('node', ['./supplier/dsa_supplier.js']);
 
+    
+    supplier_sign.stdout.on('data', (data) => {
+        console.log(`supplier_sign output: ${data}`);
+        const msg = data.toString().trim();
+        if (msg.includes('sign_time')) {
+            // const match = msg.match(/\d+(\.\d+)?/);
+            sign_time = parseFloat(msg.split('sign_time: ')[1]);
+        }
+    });
+
     // 자식 프로세스의 표준 에러 출력 처리
     supplier_sign.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`);
@@ -19,14 +29,6 @@ function run(callback) {
     });
 
 
-    supplier_sign.stdout.on('data', (data) => {
-        const msg = data.toString().trim();
-        if (msg.includes('sign_time')) {
-            // const match = msg.match(/\d+(\.\d+)?/);
-            sign_time = parseFloat(msg.split('sign_time: ')[1]);
-        }
-        // console.log(`supplier_sign output: ${data}`);
-    });
     
     supplier_sign.on('exit', (code) => {
         if (code === 0) {

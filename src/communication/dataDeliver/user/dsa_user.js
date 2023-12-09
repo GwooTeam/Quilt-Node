@@ -1,7 +1,5 @@
 //tcp server
 
-console.log('im in dsa_user.js');
-
 const net = require('net');
 const { exec } = require('child_process');
 const { execSync } = require('child_process');
@@ -14,6 +12,7 @@ const userPort = config.user_port;
 
 let verify_res = 1;
 
+console.log('jal na wo');
 
 
 let nodeNum = 0;
@@ -26,12 +25,11 @@ const textServer = net.createServer(socket => {
     
     console.log('Client connected');
     socket.on('data', data => {
+      console.log(data);
         const message = data.toString();
         const clientData = clients[clientId];
-        // console.log('message: ' + message);
         if (message === 'auth request') { 
             console.log('Authentication request received');
-            // console.time("authModuleExecutionTime");
            // Generate a random value
            const randomValue = Math.random().toString(36).substr(2, 9);
            console.log(`Generated Random Value: ${randomValue}`);
@@ -62,12 +60,8 @@ const textServer = net.createServer(socket => {
       })
     
     socket.on('end', () => {
-        console.log('File transfer completed');
-        // fileReceivedCount++;
-        
         console.log('Client disconnected');
         delete clients[clientId];
-  
     });
   
     socket.on('error', (error) => {

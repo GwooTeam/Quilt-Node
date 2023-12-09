@@ -31,6 +31,7 @@ textClient.connect(userPort, host, () => {
   //     textClient.write(line);
   //     rl.prompt();
   // });
+  console.log(5555);
   console.time("sign_time");
   textClient.write("auth request");
 });
