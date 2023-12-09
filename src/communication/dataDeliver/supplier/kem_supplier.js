@@ -1,3 +1,4 @@
+//tcp client
 const net = require('net');
 const { execSync } = require('child_process');
 const readline = require('readline');
@@ -13,43 +14,40 @@ const filePort = config.kem_file_port; // Port for file transfer
 const host = config.user_ip;
 const fileClient = new net.Socket();
 
-
 /* paths */
-const puk_path = 'suppResource/kyber_key.puk';
-// const capsule_save_path = 'suppResource/';
-// const capsule_file_path = 'suppResource/kyber_encapsulated.cap';
-// const ssk_path = 'suppResource/kyber_sharedSecret.ssk';
-// const enc_path = 'suppResource/received_encrypted.bin';
-// const result_path = 'suppResource/';
-
+const puk_path = 'supplier/suppResource/kyber_key.puk';
 
 let cap_val;
 let ssk_val;
 
-
 /*  functions  */
 function kem_encapsulate(pukVal) {
-    let encap_out = execSync(`../../KEM/modules/kmodule --encap -r --key=123`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Execution error: ${error.message}`);
-            return;
+    try {
+        // execSync 함수는 명령어의 표준 출력을 반환합니다.
+        let encap_out = execSync(`export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule --encap -r --key=${pukVal}`);
+
+        // 여기서 encap_out 변수에 저장된 표준 출력을 사용합니다.
+        // console.log('stdout:' + encap_out.toString());
+        cap_val = ((encap_out.toString()).match(/encapsulated=([^&]+)/))[1];
+        ssk_val = ((encap_out.toString()).match(/ssk=([^&]+)/))[1];
+        console.log('ssk val: ' + ssk_val);
+
+        // 필요한 추가 처리...
+    } catch (error) {
+        // 오류 발생 시, 에러 메시지를 출력합니다.
+        console.error(`Execution error: ${error.message}`);
+        // stderr는 error 객체의 출력에서 찾을 수 있습니다.
+        if (error.stderr) {
+            console.error(`Stderr: ${error.stderr.toString()}`);
         }
-        if (stderr) {
-            console.error(`Stderr: ${stderr}`);
-            return;
-        }
-        
-    });
-    cap_val = ((encap_out.toString()).match(/encapsulated=([^&]+)/))[1];
-    ssk_val = ((encap_out.toString()).match(/ssk=([^&]+)/))[1];
-    console.log('ssk val: ' + ssk_val);
+    }
 }
 
 
 // let decrypt_out;
 function ssk_decrypt(sskVal, encVal) {
     
-    let dec_out = execSync(`../../KEM/modules/kmodule --decrypt -r --key=${sskVal} --target=${encVal}`, (error, stdout, stderr) => {
+    let dec_out = execSync(`export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule --decrypt -r --key=${sskVal} --target=${encVal}`, (error, stdout, stderr) => {
         if (error) {
             console.error(`Execution error: ${error.message}`);
             return;
@@ -61,17 +59,14 @@ function ssk_decrypt(sskVal, encVal) {
         
     });
     let res = ((dec_out.toString()).match(/dec=([^&]+)/))[1];
-    console.log('dec res: ' + res);
+    // console.log('dec res: ' + res);
 }
 
 
 function sendFile(encapVal, callback) {
 
     fileClient.connect(filePort, host, () => {
-        // console.log(`Connected to the file server for sending ` + encapVal);
-        // const fileContent = fs.readFileSync(filePath);
-
-        fileClient.write(encapVal);
+    fileClient.write(encapVal);
         // fileClient.end();
     });
 }
@@ -109,7 +104,7 @@ function readBytesFromFile(filePath) {
     try {
       // 동기적으로 파일 읽기
       const fileBuffer = fs.readFileSync(filePath);
-  
+      
       // Buffer를 이용하여 각 바이트를 16진수 문자열로 변환
       const byteCodeString = [];
       for (let i = 0; i < fileBuffer.length; i++) {

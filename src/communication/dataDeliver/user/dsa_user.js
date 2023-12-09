@@ -12,8 +12,6 @@ const userPort = config.user_port;
 
 let verify_res = 1;
 
-console.log('jal na wo');
-
 
 let nodeNum = 0;
 
@@ -25,7 +23,6 @@ const textServer = net.createServer(socket => {
     
     console.log('Client connected');
     socket.on('data', data => {
-      console.log(data);
         const message = data.toString();
         const clientData = clients[clientId];
         if (message === 'auth request') { 

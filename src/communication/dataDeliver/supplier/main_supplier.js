@@ -34,6 +34,7 @@ function run(callback) {
         if (code === 0) {
             // kem code
             // supplier_dsa.js가 성공적으로 완료된 경우에만 다음 프로세스 실행
+
             const supplier_kem = spawn('node', ['./supplier/kem_supplier.js']);
 
             supplier_kem.stdout.on('data', (data) => {
@@ -42,7 +43,7 @@ function run(callback) {
                     // const match = msg.match(/\d+(\.\d+)?/);
                     kem_time = parseFloat(msg.split('kem_time: ')[1]);
                 }
-                // console.log(`supplier_kem output: ${data}`);
+                console.log(`supplier_kem output: ${data}`);
             });
             
             supplier_kem.on('exit', (kemCode) => {

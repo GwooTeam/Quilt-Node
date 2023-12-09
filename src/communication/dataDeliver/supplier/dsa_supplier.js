@@ -6,31 +6,22 @@ const config = require('./supplier_config.json');
 const host = config.user_ip;
 const userPort = config.user_port;
 
-console.log('1111');
-
 let puk_val;
 let prk_val;
 let sign_val;
 
-
-
-
 const textClient = new net.Socket();
 textClient.connect(userPort, host, () => {
-    console.log(111111);
     console.time('sign_time');
     textClient.write('auth request');
 });
 
 textClient.on('data', (data) => {
-    console.log(data);
     const message = data.toString().trim();
-    console.log(`Server: ${message}`);
-
+    console.log(message);
     // Check if the message is a random value
     if (message.startsWith('Random Value: ')) {
         const randomValue = message.split('Random Value: ')[1];
-        console.log(randomValue);
         handleNonceSign(randomValue);
     }
     else if (message.startsWith('verify OK')) {
