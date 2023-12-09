@@ -15,7 +15,7 @@ interface NodeAuthConfig{
     SERVER_URL_PATH:ServerURLPath;
 }
 
-class NodeAuthAPI{
+export class NodeAuthAPI{
     node_auth_config:NodeAuthConfig;
     server_pubkey?:string;
     constructor(){
@@ -27,7 +27,7 @@ class NodeAuthAPI{
             이곳은 필요시 나중에 세션or토큰 키 저장을 위한 공간
         */
     }
-    public async requestServerPubKey():Promise<unknown|string>{
+    public async requestServerPubKey():Promise<string>{
         const url = path.join(this.node_auth_config.SERVER_DOMAIN, this.node_auth_config.SERVER_URL_PATH.getServerPubKey);
         const data = {};
         try{
@@ -60,33 +60,38 @@ class NodeAuthAPI{
         let crypto_module_path_wsl = null;
         if(os.platform().includes("win")){
             //현재파일기준으로 암호모듈파일 상대경로를 넣음
-            const temp = path.join(__dirname, "..", "..", "..", "KEM", "modules", "kmodule").split(":");
+            const temp = path.join(__dirname, "..", "..", "..", "crypto", "kmodule", "modules", "kmodule").split(":");
             const drive = temp[0];
             const crypto_module_path_token = temp[1].split(path.win32.sep)
-            crypto_module_path_wsl = path.posix.join("/mnt", drive, ...crypto_module_path_token);
+            crypto_module_path_wsl = path.posix.join("/mnt/", drive, ...crypto_module_path_token);
         }
 
-        let crypto_module_process_result = spawnSync(`wsl ${crypto_module_path_wsl} --encap -r --key=${this.server_pubkey}`, {shell:true, encoding:"utf-8"});
+        let crypto_module_process_result = spawnSync(`wsl (export LD_LIBRARY_PATH=${path.posix.join(crypto_module_path_wsl!, "..")}; ${crypto_module_path_wsl} --encap -r --key=${this.server_pubkey})`, {encoding:"utf-8"});
         if(crypto_module_process_result.error || crypto_module_process_result.status != 0){
-            return new Error("[API] crypto module Erorr");
+            throw new Error("[API] crypto module Erorr");
         }
         let kyber_encapsuled = crypto_module_process_result.stdout;
         return kyber_encapsuled;
     }
 
-    public async enrollNonce(node_id:string){
+    public async enrollNonce(node_id:string, kyber_encapsuled:string){
         const url = path.join(this.node_auth_config.SERVER_DOMAIN, this.node_auth_config.SERVER_URL_PATH.enrollNonce.replace(`{id}`, node_id));
-        const data = {};
+        const data = {
+            "kyberEnc" : kyber_encapsuled
+        };
         /*
           response에 온 값을 카이버 인크립션 해야함
         */
+        let response = null;
         try{
-            const response = await axios.post(url, data);
+            response = await axios.post(url, data);
             console.log(`[API] enrollNonce Complete`);
             console.log(response);
         }catch(error){
             console.error(`[API] enrollNonce Error ${error}`);
+            throw error;
         }
+        return response.data.nonce;
     }
     public async verify(node_id:string, node_mac:string, node_sign:string, node_encrypt_pubkey:string, node_sign_pubkey:String, node_pubip:string){
         const url = path.join(this.node_auth_config.SERVER_DOMAIN, this.node_auth_config.SERVER_URL_PATH.verify.replace(`{id}`, node_id));
@@ -103,8 +108,12 @@ class NodeAuthAPI{
             console.log(response);
         }catch(error){
             console.error(`[API] verify Error ${error}`);
+            throw error;
         }
+        /**
+         * 여기에 받아오는 값을 파싱하고 저장하는 로직 필요함
+         * NodeCertificate(s), NodeCertificate(e)
+         */
+        return null;
     }
 }
-const temp = new NodeAuthAPI();
-temp.enrollNonce("1");
