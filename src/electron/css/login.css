@@ -1,0 +1,18 @@
+.wrapper {
+	background: #1c1e20;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100dvh;
+}
+
+.title {
+	color:rgba(255, 255, 255, 1);
+	width:223px;
+	height:115px;
+	position:absolute;
+	top: 200px;
+	font-family: 'Roboto';
+	font-size:100px;
+	letter-spacing:0;
+}
