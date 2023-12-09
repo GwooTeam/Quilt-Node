@@ -1,18 +1,48 @@
 const readline = require('readline');
-const user = require('./user.js'); // userFunction 가져오기
-const supplier = require('./supplier.js'); // supplierFunction 가져오기
+const { spawn } = require('child_process');
+const { exec } = require('child_process');
+
+
 
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
+
+
 // 사용자 입력 처리
 rl.on('line', (input) => {
     if (input === 'user') {
-        user.userFunction();
+
+        const child = spawn('node', ['./user/main_user.js']);
+
+        child.stdout.on('data', (data) => {
+            console.log(`stdout: ${data}`);
+        });
+
+        child.stderr.on('data', (data) => {
+            console.error(`stderr: ${data}`);
+        });
+
+        child.on('close', (code) => {
+            console.log(`Child process exited with code ${code}`);
+        });
+
     } else if (input === 'supplier') {
-        supplier.supplierFunction();
+        const child = spawn('node', ['./supplier/main_supplier.js']);
+
+        child.stdout.on('data', (data) => {
+            console.log(`stdout: ${data}`);
+        });
+
+        child.stderr.on('data', (data) => {
+            console.error(`stderr: ${data}`);
+        });
+
+        child.on('close', (code) => {
+            console.log(`Child process exited with code ${code}`);
+        });
     } else {
         console.log("Invalid input. Please type 'user' or 'supplier'.");
     }
