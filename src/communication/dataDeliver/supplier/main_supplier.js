@@ -6,7 +6,7 @@ let kem_time;
 
 function run(callback) {
     // verify code
-    const supplier_sign = spawn('node', ['./supplier/dsa_supplier.js']);
+    const supplier_sign = spawn('node', ['./supplier/dsa_supplier_pwsh.js']);
 
     
     supplier_sign.stdout.on('data', (data) => {
@@ -35,7 +35,7 @@ function run(callback) {
             // kem code
             // supplier_dsa.js가 성공적으로 완료된 경우에만 다음 프로세스 실행
 
-            const supplier_kem = spawn('node', ['./supplier/kem_supplier.js']);
+            const supplier_kem = spawn('node', ['./supplier/kem_supplier_pwsh.js']);
 
             supplier_kem.stdout.on('data', (data) => {
                 const msg = data.toString().trim();
@@ -51,7 +51,8 @@ function run(callback) {
                     // console.log('main_supplier complete.');
                     callback();
                 } else {
-                    console.error('error while executing kem_supplier.js');
+                    console.log(kemCode);
+                    console.error('error while executing kem_supplier_pwsh.js');
                 }
             });
 

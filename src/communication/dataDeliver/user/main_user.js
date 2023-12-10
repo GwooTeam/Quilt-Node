@@ -3,7 +3,7 @@ const { spawn } = require('child_process');
 
 function run() {
     // verify code
-    const user_sign = spawn('node', ['./user/dsa_user.js']);
+    const user_sign = spawn('node', ['./user/dsa_user_pwsh.js']);
 
     user_sign.stdout.on('data', (data) => {
         console.log(`user_sign output: ${data}`);
@@ -20,7 +20,7 @@ function run() {
     });
 
 
-    const user_kem = spawn('node', ['./user/kem_user.js']);
+    const user_kem = spawn('node', ['./user/kem_user_pwsh.js']);
 
     user_kem.stdout.on('data', (data) => {
         console.log(`user_kem output: ${data}`);

@@ -1,5 +1,7 @@
 const net = require('net');
 const { execSync } = require('child_process');
+const { exec } = require('child_process');
+
 const readline = require('readline');
 
 const config = require('./supplier_config.json');
@@ -9,6 +11,17 @@ const userPort = config.user_port;
 let puk_val;
 let prk_val;
 let sign_val;
+
+
+function powershellAsAdmin(command) {
+    exec(command, { shell: 'powershell'}, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error executing command: ${error}`);
+            return;
+        }
+        console.log(`Command executed successfully. Output:${stdout} `);
+    });
+}
 
 const textClient = new net.Socket();
 textClient.connect(userPort, host, () => {
@@ -48,17 +61,8 @@ function handleNonceSign(randomValue) {
 }
 
 function keygen_sign(callback) {
-    let keygen_out = execSync('./DigitalSignature/dmodule --keygen -r', (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Execution error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`Stderr: ${stderr}`);
-            return;
-        }
-        console.log(`keygen_sign Output: ${stdout}`); 
-    });
+    let keygen_out= execSync(`wsl bash -c "./DigitalSignature/dmodule --keygen -r"`,{ shell: 'powershell'});
+    // console.log('키사인 실행 경로'+process.cwd());
     puk_val = ((keygen_out.toString()).match(/puk=(.*?)prk=/))[1];
     prk_val = ((keygen_out.toString()).match(/prk=([^&]+)/))[1];
   
@@ -68,17 +72,8 @@ function keygen_sign(callback) {
 
 function nonce_sign_raw(dataVal, prkVal) {
 
-    let sign_out = execSync(`./DigitalSignature/dmodule -s -r ${dataVal} ${prkVal}`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Execution error: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`Stderr: ${stderr}`);
-            return;
-        }
-        // console.log(`keygen_sign Output: ${stdout}`); -- test code
-    });
+    let sign_out = execSync(`wsl bash -c "./DigitalSignature/dmodule -s -r ${dataVal} ${prkVal}"`,{ shell: 'powershell'})
+    
     sign_val = ((sign_out.toString()).match(/sign=([^&]+)/))[1];
     // console.log('sign_val: ' + sign_val);
     textClient.write('sign=' + sign_val);
