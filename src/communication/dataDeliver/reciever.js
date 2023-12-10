@@ -1,16 +1,25 @@
 const net = require('net');
 const fs = require('fs');
+const { execSync } = require("child_process");
 
 function decrypt(encryptedData) {
-    // 실제 복호화 로직 구현 필요
-    // 여기서는 단순히 문자열에서 'encrypted :'를 제거합니다.
-    const decryptedData = `decrypted : ${encryptedData}`;
-    return decryptedData;
+    try {
+        const decryptedData = execSync(
+            `wsl bash -c \"echo hello ${encryptedData} > decrypted_data2.txt ; cat decrypted_data.txt"`,
+            { encoding: "utf-8", shell: "powershell.exe" }
+          ).toString();
+        console.log(`result of dec_wsl : ${decryptedData}`);
+        return decryptedData;
+    } catch (error) {
+        console.error(`Execution error: ${error.message}`);
+        return 1;
+    }
 }
+
 
 function receiver(){
     const server = net.createServer((socket) => {
-        console.log('Client connected.');
+        console.log('Sender connected.');
     
         socket.on('data', (data) => {
             try {
@@ -18,7 +27,7 @@ function receiver(){
             
                 // 로깅을 통해 수신된 데이터 구조 확인
                 console.log('Received data:', receivedData);
-    
+                console.log(receivedData.data);
                 const decryptedData = decrypt(receivedData.data);
                 // 데이터 타입에 따라 처리
                 if (receivedData.type === 'txt') {

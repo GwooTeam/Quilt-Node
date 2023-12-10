@@ -1,12 +1,22 @@
 // sendFunction 파일
 const net = require('net');
 const fs = require('fs');
+const { execSync } = require("child_process");
 
 function encrypt(data) {
-    // 실제 암호화 로직은 구현되지 않았습니다.
-    // 여기서는 단순히 문자열에 'encrypted :'를 붙여 반환합니다.
-    const encryptedData = `encrypted : ${data}`;
-    return encryptedData;
+    // 실제 암호화 로직은 구현되지 않았습니다. 테스트를 위해 wsl에 data를 넣고 inputdata.txt를 생성 후 내용을 출력하는 코드 작성
+    try {
+        const encryptedData = execSync(
+          `wsl bash -c \"echo  ${data} > inputdata.txt ; cat inputdata.txt"`,
+          { encoding: "utf-8", shell: "powershell.exe" }
+        ).toString();
+        console.log(`result of wsl : ${encryptedData}`);
+        return encryptedData;
+      } catch (error) {
+        console.error(`Execution error: ${error.message}`);
+        return 1;
+      }
+    
 }
 
 // 데이터 전송 함수
@@ -19,6 +29,7 @@ function sender(targetIP, targetPort, dataType, dataContext) {
         if (dataType === 'txt') {
             // 텍스트 데이터 암호화 및 전송
             const encryptedData = encrypt(dataContext);
+            console.log(`right: : ${encryptedData}`);
             client.write(JSON.stringify({ type: dataType, data: encryptedData }));
         } else if (dataType === 'file') {
             // 파일 데이터 읽기 및 암호화
