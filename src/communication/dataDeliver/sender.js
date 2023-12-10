@@ -2,7 +2,7 @@
 const net = require('net');
 const fs = require('fs');
 
-function encrypt(data, type) {
+function encrypt(data) {
     // 실제 암호화 로직은 구현되지 않았습니다.
     // 여기서는 단순히 문자열에 'encrypted :'를 붙여 반환합니다.
     const encryptedData = `encrypted : ${data}`;
