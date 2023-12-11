@@ -166,7 +166,9 @@ cython_debug/
 
 # Nodejs
 node_modules/
-
+package-lock.json
+*.conf
+*.exe
 # cmd txt file
 received.txt
 
