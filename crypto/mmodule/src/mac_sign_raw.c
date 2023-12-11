@@ -118,6 +118,8 @@ int mac_sign_raw(const char* mkey_val, const char* data_val) {
 
     printVal("hash=", oMacData[1].pValue, oMacData[1].ulValueLen);
 
+    exit_code = 0;
+
 
     // /*싱글파트 맥 검증*/
     // if((ret=NS_verify_init(&macctx, (NT_OBJECT_PTR)&oKey))!= NRC_OK ){
