@@ -65,7 +65,7 @@ class WSL{
     }
 
     async KyberDecrypt(key, cipher){
-        let cmd = `${this.pre_script}${this.kmodule_env_path};${this.kmodule_path} -r --decrypt --key=${key} --target=${cipher})`;
+        let cmd = `${this.pre_script}${this.kmodule_env_path};${this.kmodule_path} --decrypt -r --key=${key} --target=${cipher})`;
         if(this.debug) console.log("kyberKeyGen :\n"+cmd);
         let result = spawnSync(
             cmd,
@@ -75,6 +75,7 @@ class WSL{
         if(result.error||result.status != 0){
             throw new Error("[API] crypto module Error");
         }
+        console.error(result.stderr.toString());
         return result.stdout.toString();
     }
 
@@ -112,14 +113,14 @@ class WSL{
     }
 
     async hashing(target, mk){
-        let cmd = `${this.pre_script}${this.mmodule_env_path};${this.mmodule_path} --hash -r ${target} ${mk})`;
+        let cmd = `${this.pre_script}${this.mmodule_env_path};${this.mmodule_path} --hash -r --target=${target} --key=${mk})`;
         if(this.debug) console.log("hashing :\n"+cmd);
         let result = spawnSync(
             cmd,
             {shell:"cmd"}
         );
         if(this.debug)console.log(result);
-        if(result.error||result.status != 0){
+        if(result.error){
             throw new Error("[API] crypto module Error");
         }
         let hash = result.stdout.toString().split("hash=")[1]; 

@@ -106,15 +106,16 @@ class NodeAuthAPI{
          * 그래서 이를 session_key로 복호화해야하고 2글자씩 끊어서 아스키코드화해야한다.
          * nonce는 10자리 알파벳+숫자이다.
          */
-        let encrypted_nonce_byte_code = response.data.nonce;
+        let encrypted_nonce_byte_code = response.data;
         let wsl_return;
         try{
-            wsl_return = await this.wsl.KyberDecrypt(this.server_pubkey, encrypted_nonce_byte_code);
+            wsl_return = await this.wsl.KyberDecrypt(session_key, encrypted_nonce_byte_code.nonce);
         }catch(error){
-            throw error
+            throw error;
         }
         //암호모듈반환값은 00000으로 패딩처리되어있으니 이후를 무시
-        let nonce_byte_code = wsl_return.split("dec=")[1].split("length=")[0];
+        //let nonce_byte_code = wsl_return.split("dec=")[1].split("length=")[0];
+        let nonce_byte_code = wsl_return.split("dec=")[1].split("00000")[0];
         let nonce = byteCodeToString(nonce_byte_code);
         return nonce;
     }
@@ -136,14 +137,19 @@ class NodeAuthAPI{
             console.error(`[API] verify Error ${error}`);
             throw error;
         }
-        if(!isSuccessResponse(response)) throw new Error("[API] verify http Error");
+        if(!isSuccessResponse(response)){
+            if(response.status===400){
+                throw new Error("[API] verify FAILED! this node can't be verified by server!");
+            }
+            throw new Error("[API] verify http Error");
+        }
         console.log(`[API] verify Complete`);
         if(this.debug)console.log(response);
         /**
          * 여기에 받아오는 값을 파싱하고 저장하는 로직 필요함
          * NodeCertificate(s), NodeCertificate(e)
          */
-        return null;
+        return response.data;
     }
 }
 
