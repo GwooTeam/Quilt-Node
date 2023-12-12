@@ -58,10 +58,10 @@ void kyber_decapsulate(const char* prk_path, const char* capsule_path, const cha
         decap_file_path = "kyber_decapsulated.ssk";
     }
 
-    puts("check in kyber_decapsulate()");
-    printf("prk_path: %s\n", prk_path);
-    printf("capsule_path: %s\n", capsule_path);
-    printf("decap_path: %s\n", decap_path);
+    // puts("check in kyber_decapsulate()");
+    // printf("prk_path: %s\n", prk_path);
+    // printf("capsule_path: %s\n", capsule_path);
+    // printf("decap_path: %s\n", decap_path);
 
     /**
      * Step 0. 모드 변경
@@ -190,7 +190,7 @@ void kyber_decapsulate(const char* prk_path, const char* capsule_path, const cha
 
     
     puts("generate decapsulate data to file..");
-    printf("decap_file_path = %s\n", decap_file_path);
+    // printf("decap_file_path = %s\n", decap_file_path);
     FILE* decap_file = fopen(decap_file_path, "wb");
     // FILE* decap_file = fopen("decapsuleted_key.ssk", "wb");
     // decap_file = fopen(decap_file_path, "wb");
@@ -207,7 +207,7 @@ void kyber_decapsulate(const char* prk_path, const char* capsule_path, const cha
     // fflush(decap_file);
     fclose(decap_file);
     puts("generate decapsulated data file complete.");
-    printVal("ssk=", oSharedSecret[1].pValue, oSharedSecret[1].ulValueLen);
+    // printVal("ssk=", oSharedSecret[1].pValue, oSharedSecret[1].ulValueLen);
 
 
 err:
