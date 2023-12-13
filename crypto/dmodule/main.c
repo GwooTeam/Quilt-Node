@@ -68,6 +68,9 @@ int main(int argc, char *argv[]) {
             res = dilithium_verify_raw(data_file_path, signed_file_path, puk_path);
         }
         else if (strcmp(argv[2], "-f") == 0) {
+            data_file_path =  argv[3];
+            signed_file_path = argv[4];
+            puk_path = argv[5];
             res = dilithium_verify(data_file_path, signed_file_path, puk_path);
         }
         else {

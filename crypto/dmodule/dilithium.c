@@ -225,6 +225,7 @@ void dilithium_sign(const char *data_path, const char *prk_path)
     fclose(signed_file);
     puts("\n\nsuccess to create signed file!\n");
     printf("signed file len : %d\n",oSignData[1].ulValueLen);
+    printf("DataBuf: %s\n", DataBuf);
 
 err:
     NS_clear_object((NT_OBJECT_PTR)&oPublicKey, 2);
@@ -261,7 +262,7 @@ int dilithium_verify(const char *data_file_path, const char *signed_path, const 
         {NAT_DILITHIUM_IS_RANDOMIZING_SIGNING, NULL, 0, FALSE, FALSE},
         {NAT_RANDOM_FUNCTION_TYPE, NULL, 0, FALSE, FALSE}};
 
-    NT_BYTE DataBuf[10130] = { 0, };  // 문자열을 저장할 배열, 충분한 크기로 설정
+    NT_BYTE DataBuf[10130]= { 0, };  // 문자열을 저장할 배열, 충분한 크기로 설정
     NT_OBJECT oData = {
         {NAT_OBJECT_TYPE, &data_type, sizeof(data_type), FALSE, FALSE},
         {NAT_VALUE, DataBuf, (NT_ULONG)sizeof(DataBuf), FALSE, FALSE},
@@ -326,6 +327,7 @@ int dilithium_verify(const char *data_file_path, const char *signed_path, const 
     }
     fclose(data_file);
     // printf("### data.txt : \n %s\n",DataBuf);
+    printf("DataBuf: %s\n", DataBuf);
 
 
     /*서명된 파일 불러오기*/
@@ -369,6 +371,7 @@ int dilithium_verify(const char *data_file_path, const char *signed_path, const 
     }
 
     printf("\nsuccess verify !!\n");
+    
     return_code = 0;
 
 err:

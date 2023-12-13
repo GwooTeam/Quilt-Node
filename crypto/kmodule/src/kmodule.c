@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <ctype.h>
 
-#include "nsc_api.h"
+#include "quiltSafer_api.h"
 #include "kyber_keygen.h"
 #include "kyber_encapsulate.h"
 #include "kyber_decapsulate.h"
@@ -34,7 +35,6 @@ int main(int argc, char* argv[]) {
     char* key = NULL;
     char* target = NULL;
     char* result = NULL;
-    char* type = NULL;
 
     // strcut option의 배열 long_options[]
     // 여기는 긴 옵션 (--)들 설정
@@ -69,10 +69,6 @@ int main(int argc, char* argv[]) {
         // result
         case '3':
             result = optarg;
-            break;
-
-        case '4':
-            type = optarg;
             break;
         
         case 'f':
@@ -123,18 +119,46 @@ int main(int argc, char* argv[]) {
         }
         else if (flag_encap) {
             // puts("flag_encap activated!");
+            if(key==NULL) {
+                fprintf(stderr, "encap err: no key provided.\n");
+                goto err;
+            }
             kyber_encapsulate_raw(key);
         }
         else if(flag_decap) {
             // puts("flag_decap activated!");
+            if(key==NULL) {
+                fprintf(stderr, "decap err: no key provided.\n");
+                goto err;
+            }
+            if(target==NULL) {
+                fprintf(stderr, "decap err: no encap provided.\n");
+                goto err;
+            }
             kyber_decapsulate_raw(key, target);
         }
         else if(flag_encrypt) {
             // puts("flag_encrypt activated!");
+            if(key==NULL) {
+                fprintf(stderr, "encrypt err: no key provided.\n");
+                goto err;
+            }
+            if(target==NULL) {
+                fprintf(stderr, "encrypt err: no plain data provided.\n");
+                goto err;
+            }
             kyber_encrypt_raw(key, target);
         }
         else if(flag_decrypt) {
             // puts("flag_decrypt activated!");
+            if(key==NULL) {
+                fprintf(stderr, "decrypt err: no key provided.\n");
+                goto err;
+            }
+            if(target==NULL) {
+                fprintf(stderr, "decrypt err: no plain data provided.\n");
+                goto err;
+            }
             kyber_decrypt_raw(key, target);
         }
         else {
@@ -142,31 +166,61 @@ int main(int argc, char* argv[]) {
         }
     }
     else if(flag_file) {
-
         if(flag_keygen) {
             // puts("flag_keygen activated!");
             kyber_keygen(result);
         }
         else if (flag_encap) {
             // puts("flag_encap activated!");
+            if(key==NULL) {
+                fprintf(stderr, "encap err: no key provided.\n");
+                goto err;
+            }
             kyber_encapsulate(key, result);
         }
         else if(flag_decap) {
             // puts("flag_decap activated!");
+            if(key==NULL) {
+                fprintf(stderr, "decap err: no key provided.\n");
+                goto err;
+            }
+            if(target==NULL) {
+                fprintf(stderr, "decap err: no encap provided.\n");
+                goto err;
+            }
             kyber_decapsulate(key, target, result);
         }
         else if(flag_encrypt) {
             // puts("flag_encrypt activated!");
+            if(key==NULL) {
+                fprintf(stderr, "encrypt err: no key provided.\n");
+                goto err;
+            }
+            if(target==NULL) {
+                fprintf(stderr, "encrypt err: no plain data provided.\n");
+                goto err;
+            }
             kyber_encrypt(key, target, result);
         }
         else if(flag_decrypt) {
             // puts("flag_decrypt activated!");
+            if(key==NULL) {
+                fprintf(stderr, "decrypt err: no key provided.\n");
+                goto err;
+            }
+            if(target==NULL) {
+                fprintf(stderr, "decrypt err: no plain data provided.\n");
+                goto err;
+            }
             kyber_decrypt(key, target, result);
         }
         else {
             fprintf(stderr, "err: no options activated\n");
         }
-
+    }
+    else {
+        fprintf(stderr, "err: not enough option: please use -f (file) or -r (raw data).\nexample: kmodule --keygen -f\n");
+        goto err;
     }
     
 
@@ -175,10 +229,3 @@ err:
     return 0;
 }
 
-// 내부 모듈이라 굳이 안쓰는게 나을지도?
-void usage() {
-    puts("usage: kmodule --keygen [key_length] [key_path] \
-                 kmodule [file_path | raw_data] [-e | -d] -k [key_path] \
-                 kmodule --encap [bob_puk] \
-                 kmodule --decap [alice_prk]");
-}
