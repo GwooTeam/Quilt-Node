@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "nc_api.h"
+#include "quiltSafer_api.h"
 
 /// @brief Dilithium3 Standard
 
@@ -39,9 +39,9 @@ void dilithium_keygen()
      * Step 0-2. 암호모듈 상태 변경
      * 양자내성암호 모듈을 사용하기 위해 현재 암호모듈의 상태를 다음과 같이 변경한다.
      */
-    printf("current status = %d\n", NS_get_state());
+    // printf("current status = %d\n", NS_get_state());
     NS_change_state(NST_MODULE_DISAPPROVAL_PQC);
-    printf("current status = %d\n", NS_get_state());
+    // printf("current status = %d\n", NS_get_state());
 
     /**
      * Step 1. 키 쌍 생성
@@ -60,10 +60,10 @@ void dilithium_keygen()
     }
 
     // 생성된 키 쌍 출력
-    NS_hex_dump(oPublicKey[1].pValue, oPublicKey[1].ulValueLen, (NT_BYTE_PTR) "public key");
+    // NS_hex_dump(oPublicKey[1].pValue, oPublicKey[1].ulValueLen, (NT_BYTE_PTR) "public key");
     printf("*pub key len : %d\n",oPublicKey[1].ulValueLen);
     
-    NS_hex_dump(oPrivateKey[1].pValue, oPrivateKey[1].ulValueLen, (NT_BYTE_PTR) "private key"); 
+    // NS_hex_dump(oPrivateKey[1].pValue, oPrivateKey[1].ulValueLen, (NT_BYTE_PTR) "private key"); 
     printf("*private key len : %d\n\n",oPrivateKey[1].ulValueLen);
 
 
@@ -137,9 +137,9 @@ void dilithium_sign(const char *data_path, const char *prk_path)
      * Step 0-2. 암호모듈 상태 변경
      * 양자내성암호 모듈을 사용하기 위해 현재 암호모듈의 상태를 다음과 같이 변경한다.
      */
-    printf("current status = %d\n", NS_get_state());
+    // printf("current status = %d\n", NS_get_state());
     NS_change_state(NST_MODULE_DISAPPROVAL_PQC);
-    printf("current status = %d\n", NS_get_state());
+    // printf("current status = %d\n", NS_get_state());
 
    
     /**
@@ -165,7 +165,7 @@ void dilithium_sign(const char *data_path, const char *prk_path)
 
     oPrivateKey[1].pValue = prk_value;
     // check private key
-    NS_hex_dump(oPrivateKey[1].pValue, oPrivateKey[1].ulValueLen, (NT_BYTE_PTR) "private key");
+    // NS_hex_dump(oPrivateKey[1].pValue, oPrivateKey[1].ulValueLen, (NT_BYTE_PTR) "private key");
     printf("\n");
 
 
@@ -193,7 +193,7 @@ void dilithium_sign(const char *data_path, const char *prk_path)
         printf("fail to read data from file.\n");
     }
     fclose(data_file);
-    printf("### data.txt : \n %s\n",DataBuf);
+    // printf("### data.txt : \n %s\n",DataBuf);
 
 
     /**
@@ -212,7 +212,7 @@ void dilithium_sign(const char *data_path, const char *prk_path)
         goto err;
     }
     
-    NS_hex_dump(oSignData[1].pValue,oSignData[1].ulValueLen, (NT_BYTE_PTR) "signed data");
+    // NS_hex_dump(oSignData[1].pValue,oSignData[1].ulValueLen, (NT_BYTE_PTR) "signed data");
 
     /*서명 내용 파일로 저장*/
     FILE *signed_file = fopen("dilithium_signed.bin", "wb");
@@ -225,7 +225,7 @@ void dilithium_sign(const char *data_path, const char *prk_path)
     fclose(signed_file);
     puts("\n\nsuccess to create signed file!\n");
     printf("signed file len : %d\n",oSignData[1].ulValueLen);
-    printf("DataBuf: %s\n", DataBuf);
+    // printf("DataBuf: %s\n", DataBuf);
 
 err:
     NS_clear_object((NT_OBJECT_PTR)&oPublicKey, 2);
@@ -280,9 +280,9 @@ int dilithium_verify(const char *data_file_path, const char *signed_path, const 
      * Step 0-2. 암호모듈 상태 변경
      * 양자내성암호 모듈을 사용하기 위해 현재 암호모듈의 상태를 다음과 같이 변경한다.
      */
-    printf("current status = %d\n", NS_get_state());
+    // printf("current status = %d\n", NS_get_state());
     NS_change_state(NST_MODULE_DISAPPROVAL_PQC);
-    printf("current status = %d\n", NS_get_state());
+    // printf("current status = %d\n", NS_get_state());
 
    
     /**
@@ -307,7 +307,7 @@ int dilithium_verify(const char *data_file_path, const char *signed_path, const 
     fclose(puk_file);
     oPublicKey[1].pValue = puk_value;
     // check public key
-    NS_hex_dump(oPublicKey[1].pValue, oPublicKey[1].ulValueLen, (NT_BYTE_PTR) "public key");
+    // NS_hex_dump(oPublicKey[1].pValue, oPublicKey[1].ulValueLen, (NT_BYTE_PTR) "public key");
    
 
     /*서명 대상 데이터 파일 읽어오기*/
@@ -327,7 +327,7 @@ int dilithium_verify(const char *data_file_path, const char *signed_path, const 
     }
     fclose(data_file);
     // printf("### data.txt : \n %s\n",DataBuf);
-    printf("DataBuf: %s\n", DataBuf);
+    // printf("DataBuf: %s\n", DataBuf);
 
 
     /*서명된 파일 불러오기*/
@@ -348,7 +348,8 @@ int dilithium_verify(const char *data_file_path, const char *signed_path, const 
 
     /*검증 초기 작업*/
     if ((ret = NS_verify_init(&signctx,
-                              (NT_OBJECT_PTR)&oPublicKey)) != NRC_OK)
+                              (NT_OBJECT_PTR)&oPublicKey,
+                              (NT_OBJECT_PTR)&oSignData)) != NRC_OK)
     {
         printf("NS_verify_init failed: %s\n", NS_get_errmsg(ret));
         goto err;
@@ -363,14 +364,13 @@ int dilithium_verify(const char *data_file_path, const char *signed_path, const 
      * oSignData(in): 서명 컨텍스트
      */
     if ((ret = NS_verify(&signctx,
-                         (NT_OBJECT_PTR)&oData,
-                         (NT_OBJECT_PTR)&oSignData)) != NRC_OK)
+                         (NT_OBJECT_PTR)&oData)) != NRC_OK)
     {
         printf("NS_verify failed: %s\n", NS_get_errmsg(ret));
         goto err;
     }
 
-    printf("\nsuccess verify !!\n");
+    // printf("\nsuccess verify !!\n");
     
     return_code = 0;
 

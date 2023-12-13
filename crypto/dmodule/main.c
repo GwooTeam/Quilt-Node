@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <getopt.h>
 
-#include "nc_api.h"
+#include "quiltSafer_api.h"
 #include "dilithium.h"
 #include "dilithium_raw.h"
 #include "quilt_api.h"
