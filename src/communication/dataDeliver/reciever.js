@@ -5,7 +5,7 @@ const { execSync } = require("child_process");
 function decrypt(encryptedData) {
     try {
         const decryptedData = execSync(
-            `wsl bash -c \"echo hello ${encryptedData} > decrypted_data2.txt ; cat decrypted_data.txt"`,
+            `wsl bash -c \"echo hello ${encryptedData} > decrypted_data.txt ; cat decrypted_data.txt"`,
             { encoding: "utf-8", shell: "powershell.exe" }
           ).toString();
         console.log(`result of dec_wsl : ${decryptedData}`);

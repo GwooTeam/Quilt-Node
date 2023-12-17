@@ -23,14 +23,18 @@ let ssk_val;
 /*  functions  */
 function kem_encapsulate(pukVal) {
     try {
+        console.log('**before**');
         // execSync 함수는 명령어의 표준 출력을 반환합니다.
-        let encap_out = execSync(`wsl bash -c "export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule --encap -r --key=${pukVal}"`,{shell:"powershell"});
-
+        let encap_out = execSync(`wsl bash -c "export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule --encap -f --key=./supplier/suppResource/kyber_key.puk --result=./supplier/suppResource/"`,{shell:"powershell"});
+        console.log('**after**');
+        // console.log(encap_out);
+        // readBytesFromFile()
         // 여기서 encap_out 변수에 저장된 표준 출력을 사용합니다.
         // console.log('stdout:' + encap_out.toString());
-        cap_val = ((encap_out.toString()).match(/encapsulated=([^&]+)/))[1];
-        ssk_val = ((encap_out.toString()).match(/ssk=([^&]+)/))[1];
-        console.log('ssk val: ' + ssk_val);
+        // cap_val = ((encap_out.toString()).match(/encapsulated=([^&]+)/))[1];
+        // ssk_val = ((encap_out.toString()).match(/ssk=([^&]+)/))[1];
+        // console.log('ssk val: ' + ssk_val);
+        // console.log('**sskval**');
 
         // 필요한 추가 처리...
     } catch (error) {
@@ -47,7 +51,7 @@ function kem_encapsulate(pukVal) {
 // let decrypt_out;
 function ssk_decrypt(sskVal, encVal) {
     
-    let dec_out = execSync(`wsl bash -c "export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule --decrypt -r --key=${sskVal} --target=${encVal}"`,{shell:"powershell"})
+    let dec_out = execSync(`wsl bash -c "export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule --decrypt -f --key=${sskVal} --target=${encVal}"`,{shell:"powershell"})
     let res = ((dec_out.toString()).match(/dec=([^&]+)/))[1];
     // console.log('dec res: ' + res);
 }
@@ -56,8 +60,9 @@ function ssk_decrypt(sskVal, encVal) {
 function sendFile(encapVal, callback) {
 
     fileClient.connect(filePort, host, () => {
-        fileClient.write(encapVal);
+        fileClient.write(readBytesFromFile('.\\supplier\\suppResource\\kyber_encapsulated.cap'));
          //fileClient.end();
+        console.log('cap sent');
     });
 }
 
@@ -122,7 +127,7 @@ const puk_val = readBytesFromFile(puk_path);
 
 async function runFunctions() {
     console.time('kem_time');
-    // console.log(puk_val);
+    console.log(puk_val);
     await kem_encapsulate(puk_val);
     // console.log(cap_val);
     await sendFile(cap_val);

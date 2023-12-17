@@ -7,7 +7,7 @@ function encrypt(data) {
     // 실제 암호화 로직은 구현되지 않았습니다. 테스트를 위해 wsl에 data를 넣고 inputdata.txt를 생성 후 내용을 출력하는 코드 작성
     try {
         const encryptedData = execSync(
-          `wsl bash -c \"echo  ${data} > inputdata.txt ; cat inputdata.txt"`,
+          `wsl bash -c \"export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule --encrypt -f --key=./user/userResource/kyber_sharedSecret.ssk --target=./testfile.txt"`,
           { encoding: "utf-8", shell: "powershell.exe" }
         ).toString();
         console.log(`result of wsl : ${encryptedData}`);
