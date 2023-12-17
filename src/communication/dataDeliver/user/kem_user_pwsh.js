@@ -63,12 +63,12 @@ const fileServer = net.createServer(socket => {
       console.log('파일이 성공적으로 저장되었습니다.');
   });
    
-    // capslue 파일을 prk로 디캡슐화 하고 암호화 파일을 생성한다.
+    // capslue 파일을 prk로 디캡슐화
     let prk_val = readBytesFromFile(prk_path);
     kem_decapsulate(prk_val, capsule_path);
 
-    let data_val = readBytesFromFile(data_path);
-    ssk_encrypt(ssk_val, data_val);
+    // let data_val = readBytesFromFile(data_path);
+    // ssk_encrypt(ssk_val, data_val);
     
     // const content = fs.readFileSync(encryptFilePath); 
     socket.write(enc_val);
@@ -108,8 +108,8 @@ function kem_decapsulate(prkVal, capVal) {
 
 }
 function ssk_encrypt(sskVal, dataVal) {
-  let enc_out = execSync(`wsl bash -c "export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule -f --encrypt --key=${sskVal} --target=${dataVal}"`, { shell: "powershell.exe" });
-  enc_val = ((enc_out.toString()).match(/enc=([^&]+)/))[1];
+  let enc_out = execSync(`wsl bash -c "export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule -f --encrypt --key=${ssk_path} --target=${dataVal}"`, { shell: "powershell.exe" });
+  // enc_val = ((enc_out.toString()).match(/enc=([^&]+)/))[1];
 }
 
 

@@ -5,7 +5,7 @@ const { execSync } = require("child_process");
 function decrypt(encryptedData) {
     try {
         const decryptedData = execSync(
-            `wsl bash -c \"echo hello ${encryptedData} > decrypted_data.txt ; cat decrypted_data.txt"`,
+            `wsl bash -c \"export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule --decrypt -f --key=./user/userResource/kyber_decapsulated.ssk --target=./kyber_encrypted.bin --result=./supplier/suppResource/"`,
             { encoding: "utf-8", shell: "powershell.exe" }
           ).toString();
         console.log(`result of dec_wsl : ${decryptedData}`);
