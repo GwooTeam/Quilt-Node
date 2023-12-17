@@ -13,7 +13,7 @@ const host = 'localhost';
 const prk_path = 'user/userResource/kyber_key.prk';
 const data_path = 'user/userResource/testData.txt';
 const capsule_path = './user/userResource/recieved_capsulated.cap'
-
+const ssk_path = './user/userResource/kyber_decapsulated.ssk'
 
 let ssk_val;
 let enc_val;
@@ -26,12 +26,6 @@ const fileServer = net.createServer(socket => {
 
   // capsule 데이터를 받았을 때
   socket.on('data', (data) => {
-    console.log(data.data);
-    console.log(typeof(data));
-
-    const cap_val = data.data;
-    console.log(cap_val);
-    console.log('print cap_val');
 
     // // Write the cap value to a file
     // fs.writeFile('.\\user\\userResource\\recieved_capsulated.cap', cap_val, (err) => {
@@ -41,11 +35,37 @@ const fileServer = net.createServer(socket => {
     //       console.log('ecieved_capsulated saved');
     //   }
     // });
-    const receivedcap =  Buffer.from(data.data);
-    saveObjectAsBinaryFile(receivedcap, 'recieved_capsulated.cap');
+    const receivedcap =  Buffer.from(data);
+    const content = receivedcap.toString('utf-8');
+    console.log(content);
+    console.log(typeof(content));
+
+
+    // 2자리씩 끊어서 각 부분을 16진수로 변환
+    const bufferArray = [];
+    for (let i = 0; i < content.length; i += 2) {
+        const hexString = content.substring(i, i + 2);
+        bufferArray.push(parseInt(hexString, 16));
+    }
+
+    // 변환된 값을 포함하는 Buffer 객체 생성
+    const buffer = Buffer.from(bufferArray);
+
+    // 결과 바이너리 데이터 출력
+    console.log(buffer);
+
+
+    fs.writeFileSync('.\\user\\userResource\\recieved_capsulated.cap', buffer,  (err) => {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      console.log('파일이 성공적으로 저장되었습니다.');
+  });
+   
     // capslue 파일을 prk로 디캡슐화 하고 암호화 파일을 생성한다.
     let prk_val = readBytesFromFile(prk_path);
-    kem_decapsulate(prk_val, data);
+    kem_decapsulate(prk_val, capsule_path);
 
     let data_val = readBytesFromFile(data_path);
     ssk_encrypt(ssk_val, data_val);
@@ -81,7 +101,7 @@ fileServer.listen(file_port, host, () => {
 /*  functions  */
 function kem_decapsulate(prkVal, capVal) {
   console.log(capVal);
-  let decap_out = execSync(`wsl bash -c "export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule -f --decap --key=${prk_path} --target=${capsule_path} --result=./user/userResource/"`,{shell:"powershell"}) 
+  let decap_out = execSync(`wsl bash -c "export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule -f --decap --key=${prk_path} --target=${capVal} --result=./user/userResource/"`,{shell:"powershell"}) 
   console.log('decap done ');
   // ssk_val = ((decap_out.toString()).match(/ssk=([^&]+)/))[1];
   // console.log('ssk val: ' + ssk_val);
