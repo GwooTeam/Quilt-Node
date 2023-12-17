@@ -2,7 +2,7 @@
 const net = require('net');
 const fs = require('fs');
 const { execSync } = require("child_process");
-
+const filePath = 'user\\userResource\\kyber_encrypted.bin'
 function encrypt(data) {
     // 실제 암호화 로직은 구현되지 않았습니다. 테스트를 위해 wsl에 data를 넣고 inputdata.txt를 생성 후 내용을 출력하는 코드 작성
     try {
@@ -11,6 +11,7 @@ function encrypt(data) {
           { encoding: "utf-8", shell: "powershell.exe" }
         ).toString();
         console.log(`result of wsl : ${encryptedData}`);
+        
         return encryptedData;
       } catch (error) {
         console.error(`Execution error: ${error.message}`);
@@ -30,7 +31,13 @@ function sender(targetIP, targetPort, dataType, dataContext) {
             // 텍스트 데이터 암호화 및 전송
             const encryptedData = encrypt(dataContext);
             console.log(`right: : ${encryptedData}`);
-            client.write(JSON.stringify({ type: dataType, data: encryptedData }));
+            fs.readFile(filePath, (err, data) => {
+                if (err) {
+                    throw err;
+                }
+                client.write(JSON.stringify({ type: dataType, data: encryptedData }))})
+            ;
+               
         } else if (dataType === 'file') {
             // 파일 데이터 읽기 및 암호화
             fs.readFile(dataContext, 'utf8', (err, data) => {
