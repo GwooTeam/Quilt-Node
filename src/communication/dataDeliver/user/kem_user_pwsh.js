@@ -27,18 +27,9 @@ const fileServer = net.createServer(socket => {
   // capsule 데이터를 받았을 때
   socket.on('data', (data) => {
 
-    // // Write the cap value to a file
-    // fs.writeFile('.\\user\\userResource\\recieved_capsulated.cap', cap_val, (err) => {
-    //   if (err) {
-    //       console.error(`Error writing to file: ${err}`);
-    //   } else {
-    //       console.log('ecieved_capsulated saved');
-    //   }
-    // });
     const receivedcap =  Buffer.from(data);
     const content = receivedcap.toString('utf-8');
-    console.log(content);
-    console.log(typeof(content));
+    
 
 
     // 2자리씩 끊어서 각 부분을 16진수로 변환
@@ -67,14 +58,11 @@ const fileServer = net.createServer(socket => {
     let prk_val = readBytesFromFile(prk_path);
     kem_decapsulate(prk_val, capsule_path);
 
-    // let data_val = readBytesFromFile(data_path);
-    // ssk_encrypt(ssk_val, data_val);
-    
-    // const content = fs.readFileSync(encryptFilePath); 
+   
     socket.write(enc_val);
     socket.end();
 
-  }); // socket.on('data')
+  }); 
 
   socket.on('end', () => {
     console.log(`File transfer completed to Node ${nodeNum}`);
@@ -89,7 +77,7 @@ const fileServer = net.createServer(socket => {
   });
 
 
-}); // const fileServer
+});
 
 
 fileServer.listen(file_port, host, () => {
@@ -100,24 +88,11 @@ fileServer.listen(file_port, host, () => {
 
 /*  functions  */
 function kem_decapsulate(prkVal, capVal) {
-  console.log(capVal);
   let decap_out = execSync(`wsl bash -c "export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule -f --decap --key=${prk_path} --target=${capVal} --result=./user/userResource/"`,{shell:"powershell"}) 
-  console.log('decap done ');
-  // ssk_val = ((decap_out.toString()).match(/ssk=([^&]+)/))[1];
-  // console.log('ssk val: ' + ssk_val);
-
-}
-function ssk_encrypt(sskVal, dataVal) {
-  let enc_out = execSync(`wsl bash -c "export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule -f --encrypt --key=${ssk_path} --target=${dataVal}"`, { shell: "powershell.exe" });
-  // enc_val = ((enc_out.toString()).match(/enc=([^&]+)/))[1];
+  console.log('success to decapsulate and get ssk');
+  
 }
 
-
-
-// function ssk_encrypt(sskVal, dataVal) {
-//   let enc_out = execSync(`wsl bash -c "export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule -r --encrypt --key=${sskVal} --target=${dataVal}`,{shell:"powershell.exe"})
-//   enc_val = ((enc_out.toString()).match(/enc=([^&]+)/))[1];
-// }
 
 function readBytesFromFile(filePath) {
   try {
@@ -136,21 +111,5 @@ function readBytesFromFile(filePath) {
   } catch (err) {
     console.error('파일을 읽는 동안 오류가 발생했습니다:', err);
     return null;
-  }
-}
-function saveObjectAsBinaryFile(obj, filename) {
-  try {
-      // 객체를 JSON 문자열로 변환
-      const jsonString = JSON.stringify(obj);
-
-      // JSON 문자열을 Buffer로 변환
-      const buffer = Buffer.from(jsonString, 'utf-8');
-
-      // 파일에 Buffer 쓰기
-      fs.writeFileSync(filename, buffer);
-
-      console.log(`Object has been saved as a binary file: ${filename}`);
-  } catch (error) {
-      console.error('Error saving object to binary file:', error);
   }
 }

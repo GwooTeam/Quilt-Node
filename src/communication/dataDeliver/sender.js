@@ -8,7 +8,7 @@ function encrypt(data) {
     // 실제 암호화 로직은 구현되지 않았습니다. 테스트를 위해 wsl에 data를 넣고 inputdata.txt를 생성 후 내용을 출력하는 코드 작성
     try {
         const encryptedData = execSync(
-          `wsl bash -c \"export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule --encrypt -f --key=./user/userResource/kyber_decapsulated.ssk --target=./testfile.txt --result=./user/userResource/"`,
+          `wsl bash -c \"export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule --encrypt -f --key=./user/userResource/kyber_decapsulated.ssk --target=./user/userResource/testData.txt --result=./user/userResource/"`,
           { encoding: "utf-8", shell: "powershell.exe" }
         ).toString();
         console.log(`result of wsl : ${encryptedData}`);
@@ -36,7 +36,7 @@ function sender(targetIP, targetPort, dataType, dataContext) {
            
             const sendingdata = readBytesFromFile('.\\user\\userResource\\kyber_encrypted.bin');
             //fileClient.end();
-            console.log('enc sent');
+            console.log('sucess to send encrypted file');
             client.write(JSON.stringify({ type: dataType, data: sendingdata }));
                
         } else if (dataType === 'file') {

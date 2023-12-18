@@ -23,20 +23,8 @@ let ssk_val;
 /*  functions  */
 function kem_encapsulate(pukVal) {
     try {
-        console.log('**before**');
-        // execSync 함수는 명령어의 표준 출력을 반환합니다.
         let encap_out = execSync(`wsl bash -c "export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule --encap -f --key=./supplier/suppResource/kyber_key.puk --result=./supplier/suppResource/"`,{shell:"powershell"});
-        console.log('**after**');
-        // console.log(encap_out);
-        // readBytesFromFile()
-        // 여기서 encap_out 변수에 저장된 표준 출력을 사용합니다.
-        // console.log('stdout:' + encap_out.toString());
-        // cap_val = ((encap_out.toString()).match(/encapsulated=([^&]+)/))[1];
-        // ssk_val = ((encap_out.toString()).match(/ssk=([^&]+)/))[1];
-        // console.log('ssk val: ' + ssk_val);
-        // console.log('**sskval**');
 
-        // 필요한 추가 처리...
     } catch (error) {
         // 오류 발생 시, 에러 메시지를 출력합니다.
         console.error(`Execution error: ${error.message}`);
@@ -52,8 +40,6 @@ function kem_encapsulate(pukVal) {
 function ssk_decrypt(sskVal, encVal) {
     
     let dec_out = execSync(`wsl bash -c "export LD_LIBRARY_PATH=./KEM/modules && ./KEM/modules/kmodule --decrypt -f --key=${sskVal} --target=${encVal}"`,{shell:"powershell"})
-    let res = ((dec_out.toString()).match(/dec=([^&]+)/))[1];
-    // console.log('dec res: ' + res);
 }
 
 
@@ -61,8 +47,7 @@ function sendFile(encapVal, callback) {
 
     fileClient.connect(filePort, host, () => {
         fileClient.write(readBytesFromFile('.\\supplier\\suppResource\\kyber_encapsulated.cap'));
-         //fileClient.end();
-        console.log('cap sent');
+        console.log('capsulated file was sent');
     });
 }
 
@@ -80,9 +65,6 @@ fileClient.on('error', (error) => {
 
 /* end of socket */
 fileClient.on('end', () => {
-    // 서버에서 받은 작업 완료된 파일을 클라이언트에 저장
-    // fs.writeFileSync(enc_path, receivedData);
-    // console.log('File transfer completed');
 
     // 소켓 연결 종료
     fileClient.end();
@@ -90,8 +72,6 @@ fileClient.on('end', () => {
 
     ssk_decrypt(ssk_val, receivedData);
 
-    // let endTime = new Date().getTime();
-    // console.log('total time: ' + (endTime - startTime) + 'ms');
     console.timeEnd('kem_time');
     process.exit(0);
     
@@ -127,9 +107,8 @@ const puk_val = readBytesFromFile(puk_path);
 
 async function runFunctions() {
     console.time('kem_time');
-    console.log(puk_val);
+    // console.log(puk_val);
     await kem_encapsulate(puk_val);
-    // console.log(cap_val);
     await sendFile(cap_val);
 }
 
