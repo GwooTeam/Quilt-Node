@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "nc_api.h"
+#include "quiltSafer_api.h"
 #include "quilt_api.h"
 
 /// @brief Dilithium3 Standard
@@ -309,7 +309,8 @@ int dilithium_verify_raw(const char* data_val, const char* sign_val, const char*
 
     /*검증 초기 작업*/
     if ((ret = NS_verify_init(&signctx,
-                              (NT_OBJECT_PTR)&oPublicKey)) != NRC_OK)
+                              (NT_OBJECT_PTR)&oPublicKey,
+                              (NT_OBJECT_PTR)&oSignData)) != NRC_OK)
     {
         fprintf(stderr, "NS_verify_init failed: %s\n", NS_get_errmsg(ret));
         goto err;
@@ -324,8 +325,7 @@ int dilithium_verify_raw(const char* data_val, const char* sign_val, const char*
      * oSignData(in): 서명 컨텍스트
      */
     if ((ret = NS_verify(&signctx,
-                         (NT_OBJECT_PTR)&oData,
-                         (NT_OBJECT_PTR)&oSignData)) != NRC_OK)
+                         (NT_OBJECT_PTR)&oData)) != NRC_OK)
     {
         fprintf(stderr, "NS_verify failed: %s\n", NS_get_errmsg(ret));
         goto err;

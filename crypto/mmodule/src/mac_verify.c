@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "nsc_api.h"
+#include "quiltSafer_api.h"
 
 int mac_verify(const char* mackey_path, const char* data_path, const char* sign_path) {
 
@@ -181,13 +180,12 @@ int mac_verify(const char* mackey_path, const char* data_path, const char* sign_
      */
 
     /*싱글파트 맥 검증*/
-    if((ret=NS_verify_init(&macctx, (NT_OBJECT_PTR)&oKey))!= NRC_OK ){
+    if((ret=NS_verify_init(&macctx, (NT_OBJECT_PTR)&oKey, (NT_OBJECT_PTR)&oMacData)) != NRC_OK ){
         printf("NS_verify_init failed: %s\n",NS_get_errmsg(ret));
         goto err;
     }
 
-    if((ret=NS_verify(&macctx, (NT_OBJECT_PTR)&oData,
-        (NT_OBJECT_PTR)&oMacData))!= NRC_OK ) {
+    if((ret=NS_verify(&macctx, (NT_OBJECT_PTR)&oData)) != NRC_OK ) {
         printf("NS_verify failed: %s\n",NS_get_errmsg(ret));
         goto err;
     }

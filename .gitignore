@@ -180,3 +180,6 @@ sandbox_gateway
 
 /src/manage/nodeAuth/config.json
 /src/manage/nodeAuth/temp.ts
+
+# vscode
+.vscode/

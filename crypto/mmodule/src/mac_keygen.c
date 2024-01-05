@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "nsc_api.h"
+#include "quiltSafer_api.h"
 
 void mac_keygen(const char* mackey_path) {
 

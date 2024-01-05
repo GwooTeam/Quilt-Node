@@ -1,5 +1,4 @@
 # !/bin/bash
 
-export LD_LIBRARY_PATH=$(pwd)
+export LD_LIBRARY_PATH="../../modulelib"
 
-sudo cp libNSKem.so /lib/libNSCrypto.so

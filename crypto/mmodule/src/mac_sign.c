@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "nsc_api.h"
+#include "quiltSafer_api.h"
 
 int mac_sign(const char* mackey_path, const char* data_path, const char* sign_path) {
 
@@ -192,7 +192,7 @@ int mac_sign(const char* mackey_path, const char* data_path, const char* sign_pa
     */
     FILE* sign_file;
     puts("generate sign file..");
-    printf("sign_file_path = %s\n", sign_file_path);
+    // printf("sign_file_path = %s\n", sign_file_path);
     sign_file = fopen(sign_file_path, "wb");
     if(sign_file == NULL) {
         printf("failed to generate sign file.\n");

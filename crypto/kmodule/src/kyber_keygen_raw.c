@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "nsc_api.h"
+#include "quiltSafer_api.h"
 #include "quilt_api.h"
 
 void kyber_keygen_raw() {

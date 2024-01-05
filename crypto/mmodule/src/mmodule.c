@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <ctype.h>
 
-#include "nsc_api.h"
+#include "quiltSafer_api.h"
 #include "mac_keygen.h"
 #include "mac_sign.h"
 #include "mac_verify.h"
@@ -107,17 +108,29 @@ int main(int argc, char* argv[]) {
         else if(flag_sign) {
             // puts("flag_sign activated!");
             if(key==NULL) {
-                fprintf(stderr, "err: no key provided.\n");
+                fprintf(stderr, "sign err: no key provided.\n");
                 goto err;
             }
             if(target==NULL) {
-                fprintf(stderr, "err: no data provided.\n");
+                fprintf(stderr, "sign err: no data provided.\n");
                 goto err;
             }
             exit_code = mac_sign(key, target, result);
         }
         else if(flag_verify) {
-            puts("flag_verify activated!");
+            // puts("flag_verify activated!");
+            if(key==NULL) {
+                fprintf(stderr, "verify err: no key(.mk) provided.\n");
+                goto err;
+            }
+            if(target==NULL) {
+                fprintf(stderr, "verify err: no data provided.\n");
+                goto err;
+            }
+            if(result==NULL) {
+                fprintf(stderr, "verify err: no result(.ms) provided.\n");
+                goto err;
+            }
             exit_code = mac_verify(key, target, result);
         }
         else {
@@ -131,31 +144,44 @@ int main(int argc, char* argv[]) {
         }
         else if(flag_sign) {
             if(key==NULL) {
-                fprintf(stderr, "err: no key provided.\n");
+                fprintf(stderr, "sign err: no key provided.\n");
                 goto err;
             }
             if(target==NULL) {
-                fprintf(stderr, "err: no data provided.\n");
+                fprintf(stderr, "sign err: no data provided.\n");
                 goto err;
             }
             exit_code = mac_sign_raw(key, target);
         }
         else if(flag_verify) {
-            puts("flag_verify activated!");
+            // puts("flag_verify activated!");
+            if(key==NULL) {
+                fprintf(stderr, "verify err: no key provided.\n");
+                goto err;
+            }
+            if(target==NULL) {
+                fprintf(stderr, "verify err: no data provided.\n");
+                goto err;
+            }
+            if(result==NULL) {
+                fprintf(stderr, "verify err: no result provided.\n");
+                goto err;
+            }
             exit_code = mac_verify_raw(key, target, result);
         }
         else {
             fprintf(stderr, "err: no options activated\n");
         }
     }
+    else {
+        fprintf(stderr, "err: not enough option: please use -f (file) or -r (raw data).\nexample: mmodule --keygen -f\n");
+        goto err;
+    }
 
 
 err:
     // puts("into err label");
-    if(flag_sign) {
-        return exit_code;
-    }
-    if(flag_verify) {
+    if(flag_sign || flag_verify) {
         return exit_code;
     }
     return 1;
