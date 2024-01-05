@@ -1,0 +1,14 @@
+{
+    "user_ip": "localhost",
+    "sign_text_port": "31245",
+    "sign_file_port": "31246",
+    "kem_text_port": "31247",
+    "kem_file_port": "31248",
+    "user_port": "31245",
+    "dmodule_path":"../DigitalSignature/dmodule",
+    "kmodule_path":"../KEM/modules/kmodule",
+
+    "supplier_ip": "localhost",
+    
+    "_comment_" : "edit this file name to config.json"
+}

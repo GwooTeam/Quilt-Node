@@ -1,0 +1,10 @@
+{
+    "user_ip": "ipaddress",
+    "user_txt_port": "port",
+    "user_file_port" : "port",
+    "supplier_ip" : "ipaddress",
+    "supplier_txt_port" : "port",
+    "supplier_file_port" : "port",
+    "_comment_" : " edit this file name to config.json"
+  
+  }

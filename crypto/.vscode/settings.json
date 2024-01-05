@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "ctype.h": "c",
+    "quilt_api.h": "c",
+    "quiltsafer_api.h": "c"
+  }
+}
